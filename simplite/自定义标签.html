@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>使用自定义模板标签</title>
+</head>
+<body>
+    <div id="ulDiv"></div>
+    <script type="text/html" id="liTeplate">
+	<li>${id}----${name}</li>
+</script>
+    <script type="text/html" id="ulTeplate">
+	<ul>
+		<!--for(var i=0;i<_this.length;i++){
+            var obj = _this[i];
+        -->
+            <li>${obj.name}</li>
+            <!-- include(liTeplate, obj)-->
+		<!--}-->
+	<ul>
+</script>
+    <script src="simplite.js"></script>
+    <script>
+        var ulData = [ {
+            id : 1,
+            name : '小学'
+        }, {
+            id : 2,
+            name : '中学'
+        }, {
+            id : 3,
+            name : '大学'
+        }, ];
+        Simplite.logicOpenTag = '<!--';
+        Simplite.logicCloseTag = '-->';
+        Simplite.attrOpenTag = '${';
+        // 最好不要使用}作为闭合标签，因为这个很可能和其他地方有冲突，推荐}}
+        Simplite.attrCloseTag = '}';
+        var ulTeplate = new Simplite({
+            target : 'ulDiv',
+            template : 'ulTeplate'
+        });
+        ulTeplate.beforerender = function(data) {
+            console.log(data)
+        };
+        ulTeplate.afterrender = function(node) {
+            console.log(node)
+        };
+        ulTeplate.render(ulData);
+    </script>
+</body>
+</html>
