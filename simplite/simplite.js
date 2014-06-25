@@ -1,9 +1,18 @@
 /**
  * @file 超轻量前端模板引擎，支持无限嵌套，逻辑嵌套模板，模板嵌套逻辑；
  * 标准js语法，灵活易用，超便捷指定数据
- * @author：张少龙（zhangshaolong@baidu.com）
+ * @author：张少龙（zhangshaolongjj@163.com）
  */
-var Simplite = function() {
+(function (root, factory) {
+    var simplite = factory();
+    if (typeof define === 'function') {
+        define(function() {
+            return simplite;
+        });
+    } else {
+        root.Simplite = simplite;
+    }
+})(this, function() {
     // 模板编译缓存
     var templateCache = {};
     var isType = function(type) {
@@ -300,4 +309,4 @@ var Simplite = function() {
     Simplite.toHtml = toHtml;
     Simplite.render = render;
     return Simplite;
-}();
+});
