@@ -113,7 +113,7 @@
 	<table class='grid'>
 		<thead>
 			<tr>
-				<%var tr=thead.tr%>
+				<%var tr=_this.thead.tr%>
 				<%for ( var i = 0; i < tr.length; i++ ) {
 				%>
 					<th><%=tr[i]%></th>
@@ -121,7 +121,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<%var trs=tbody.tr;%>
+			<%var trs=_this.tbody.tr;%>
 				<%for ( var i = 0; i < trs.length; i++ ) {%>
 					<tr>
 						<%var tr=trs[i];%>
