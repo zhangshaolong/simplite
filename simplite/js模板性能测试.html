@@ -1,0 +1,764 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>template test</title>
+<script src="http://jstemplates.sinaapp.com/js/jquery-1.7.2.min.js"></script>
+<script src="http://jstemplates.sinaapp.com/js/highcharts.js"></script>
+<script src="http://jstemplates.sinaapp.com/js/tmpl.js"></script>
+<script src="http://jstemplates.sinaapp.com/js/doT.js"></script>
+<script src="http://jstemplates.sinaapp.com/js/juicer.js"></script>
+<script src="http://jstemplates.sinaapp.com/js/kissy.js"></script>
+<script src="http://jstemplates.sinaapp.com/js/kissy-template.js"></script>
+<script src="http://jstemplates.sinaapp.com/js/template.js"></script>
+<script src="http://jstemplates.sinaapp.com/js/mustache.js"></script>
+<script src="http://jstemplates.sinaapp.com/js/handlebars.js"></script>
+<script src="http://jstemplates.sinaapp.com/js/baiduTemplate.js"></script>
+<script src="http://jstemplates.sinaapp.com/js/jquery.tmpl.js"></script>
+<script src="http://jstemplates.sinaapp.com/js/easytemplate.js"></script>
+<script src="http://jstemplates.sinaapp.com/js/underscore.js"></script>
+<script src="./simplite.js"></script>
+<script>
+// 数据量
+var length = 100;
+// 渲染次数
+var number = 10000;
+var data = {
+    list: []
+};
+for (var i = 0; i < length; i ++) {
+    data.list.push({
+        index: i,
+        user: '<strong style="color:red">糖饼</strong>',
+        site: 'http://www.planeart.cn',
+        weibo: 'http://weibo.com/planeart',
+        QQweibo: 'http://t.qq.com/tangbin'
+    });
+};
+
+
+// 待测试的引擎列表
+var testList = {list: [
+    {
+        name: 'artTemplate',
+        tester: function () {
+            template.isEscape = false;
+            var source = document.getElementById('template').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var fn = template.compile(source);
+                fn(data);
+            }
+        },
+        comp: function () {
+            template.isEscape = false;
+            var source = document.getElementById('template').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var fn = template.compile(source);
+            }
+        },
+        render: function () {
+            template.isEscape = false;
+            var source = document.getElementById('template').innerHTML;
+            var fn = template.compile(source);
+            for (var i = 0; i < number; i ++) {
+                fn(data);
+            }
+        }
+    },
+    {
+        name: 'juicer',
+        tester: function () {
+            var config = {cache:true};
+            var source = document.getElementById('juicer').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var compiled_tpl=juicer.compile(source, config);
+                compiled_tpl.render(data);
+                // juicer.to_html(source, data, config);
+            }
+        },
+        comp: function () {
+            var config = {cache:true};
+            var source = document.getElementById('juicer').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var compiled_tpl=juicer.compile(source, config);
+            }
+        },
+        render: function () {
+            var config = {cache: true};
+            var source = document.getElementById('juicer').innerHTML;
+            var compiled_tpl=juicer.compile(source, config);
+            for (var i = 0; i < number; i ++) {
+                compiled_tpl.render(data);
+                // juicer.to_html(source, data, config);
+            }
+        }
+    },
+    {
+        name: 'doT',
+        tester: function () {
+            var source = document.getElementById('doT').innerHTML;
+            for (var i = 0; i < number; i ++) {
+            var doTtmpl = doT.template(source);
+                doTtmpl(data);
+            }
+        },
+        comp: function () {
+            var source = document.getElementById('doT').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var doTtmpl = doT.template(source);
+            }
+        },
+        render: function () {
+            var source = document.getElementById('doT').innerHTML;
+            var doTtmpl = doT.template(source);
+            for (var i = 0; i < number; i ++) {
+                doTtmpl(data);
+            }
+        }
+    },
+    {
+        name: 'simplite',
+        tester: function () {
+            var source = document.getElementById('simplite').innerHTML;
+            var compile = Simplite.compile;
+            var render = compile(source);
+            for (var i = 0; i < number; i ++) {
+                var render = compile(source);
+                render(data);
+            }
+        },
+        comp: function () {
+            var source = document.getElementById('simplite').innerHTML;
+            var compile = Simplite.compile;
+            for (var i = 0; i < number; i ++) {
+                var render = compile(source);
+            }
+        },
+        render: function () {
+            var source = document.getElementById('simplite').innerHTML;
+            var render = Simplite.compile(source);
+            for (var i = 0; i < number; i ++) {
+                render(data);
+            }
+        }
+    },
+    {
+        name: 'Handlebars',
+        tester: function () {
+            var source = document.getElementById('Handlebars').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var fn = Handlebars.compile(source);
+                fn(data);
+            }
+        },
+        comp: function () {
+            var source = document.getElementById('Handlebars').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var fn = Handlebars.compile(source);
+                // fn(data);
+            }
+        },
+        render: function () {
+            var source = document.getElementById('Handlebars').innerHTML;
+            var fn = Handlebars.compile(source);
+            for (var i = 0; i < number; i ++) {
+                fn(data);
+            }
+        }
+    },
+    {
+        name: 'tmpl',
+        tester: function () {
+            var source = document.getElementById('tmpl').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var fn = tmpl(source);
+                fn(data);
+            }
+        },
+        comp: function () {
+            var source = document.getElementById('tmpl').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var fn = tmpl(source);
+            }
+        },
+        render: function () {
+            var source = document.getElementById('tmpl').innerHTML;
+            var fn = tmpl(source);
+            for (var i = 0; i < number; i ++) {
+                fn(data);
+            }
+        }
+    },
+    {
+        name: 'easyTemplate',
+        tester: function () {
+            var source = document.getElementById('easyTemplate').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var fn = easyTemplate(source);
+                // easyTemplate 渲染方法被重写到 toString(), 需要取值操作才会运行
+                fn(data) + '';
+            }
+        },
+        comp: function () {
+            var source = document.getElementById('easyTemplate').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var fn = easyTemplate(source);
+                // easyTemplate 渲染方法被重写到 toString(), 需要取值操作才会运行
+                // fn(data) + '';
+            }
+        },
+        render: function () {
+            var source = document.getElementById('easyTemplate').innerHTML;
+            var fn = easyTemplate(source);
+            for (var i = 0; i < number; i ++) {
+                // easyTemplate 渲染方法被重写到 toString(), 需要取值操作才会运行
+                fn(data) + '';
+            }
+        }
+    },
+    {
+        name: 'underscoreTemplate',
+        tester: function () {
+            var source = document.getElementById('underscoreTemplate').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var fn = _.template(source, null, {variable: 'list'});
+                fn(data);
+            }
+        },
+        comp: function () {
+            var source = document.getElementById('underscoreTemplate').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var fn = _.template(source, null, {variable: 'list'});
+            }
+        },
+        render: function () {
+            var source = document.getElementById('underscoreTemplate').innerHTML;
+            var fn = _.template(source, null, {variable: 'list'});
+            for (var i = 0; i < number; i ++) {
+                fn(data);
+            }
+        }
+    },
+    {
+        name: 'baiduTemplate',
+        tester: function () {
+            var bt = baidu.template;
+            bt.ESCAPE = false;
+            for (var i = 0; i < number; i ++) {
+                var fun = baidu.template('baidu-template');
+                var html1 = fun(data);
+                // bt('baidu-template', data);
+            }
+        },
+        comp: function () {
+            var bt = baidu.template;
+            bt.ESCAPE = false;
+            for (var i = 0; i < number; i ++) {
+                var fun = baidu.template('baidu-template');
+                // var html1 = fun(data);
+                // bt('baidu-template', data);
+            }
+        },
+        render: function () {
+            var bt = baidu.template;
+            bt.ESCAPE = false;
+            var fun = baidu.template('baidu-template');
+            for (var i = 0; i < number; i ++) {
+                var html1 = fun(data);
+            }
+        }
+    },
+// jqueryTmpl 太慢，可能导致浏览器停止响应
+/*{
+name: 'jqueryTmpl',
+tester: function () {
+var source = document.getElementById("jqueryTmpl").innerHTML;
+for (var i = 0; i < number; i ++) {
+$.tmpl(source, data);
+}
+}
+},*/
+    {
+        name: 'Mustache',
+        tester: function () {
+            var source = document.getElementById('Mustache').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var compiledTemplate = Mustache.compile(source);
+                var templateOutput = compiledTemplate(data);
+                // Mustache.to_html(source, data);
+            }
+        },
+        comp: function () {
+            var source = document.getElementById('Mustache').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var compiledTemplate = Mustache.compile(source);
+                // Mustache.to_html(source, data);
+            }
+        },
+        render: function () {
+            var source = document.getElementById('Mustache').innerHTML;
+            var compiledTemplate = Mustache.compile(source);
+            for (var i = 0; i < number; i ++) {
+                var templateOutput = compiledTemplate(data);
+            }
+        }
+    }
+]};
+KISSY.use('template', function(S,T) {
+    testList.list.push({
+        name: 'kissyTemplate',
+        tester: function () {
+            var source= document.getElementById('kissy').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var temp = T(source);
+                temp.render(data);
+            }
+        },
+        comp: function () {
+            var source= document.getElementById('kissy').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var temp = T(source);
+            }
+        },
+        render: function () {
+            var source= document.getElementById('kissy').innerHTML;
+            var temp = T(source);
+            for (var i = 0; i < number; i ++) {
+                temp.render(data);
+            }
+        }
+    });
+});
+var startComp = function () {
+    var Timer = function (){
+        this.startTime = + new Date;
+    };
+    Timer.prototype.stop = function(){
+        return + new Date - this.startTime;
+    };
+    var colors = $.extend(true, [], Highcharts.getOptions().colors);
+    var categories = [];
+    for (var i = 0; i < testList.list.length; i ++) {
+        categories.push(testList.list[i].name);
+    }
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: 'container-comp',
+            height: categories.length * 40,
+            type: 'bar'
+        },
+        title: {
+            text: '编译速度'
+        },
+        subtitle: {
+            text: length + ' 条数据 × ' + number + ' 次渲染'
+        },
+        xAxis: {
+            categories: categories,
+            labels: {
+                align: 'right',
+                style: {
+                    fontSize: '12px',
+                    fontFamily: 'Verdana, sans-serif'
+                }
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: '耗时(毫秒)'
+            }
+        },
+        legend: {
+            enabled: false
+        },
+        tooltip: {
+            formatter: function() {
+                return '<b>'+ this.x +'</b><br/>'+
+                this.y + '毫秒';
+            }
+        },
+        credits: {
+            enabled: false
+        },
+        plotOptions: {
+            bar: {
+                dataLabels: {
+                    enabled: true,
+                    formatter: function () {
+                        return this.y + 'ms';
+                    }
+                }
+            }
+        },
+        series: [{
+            data : []
+        }]
+    });
+    var log = function (message) {
+        document.getElementById('log').innerHTML = message;
+    };
+    var comp = function (target) {
+        var time = new Timer;
+        target.comp();
+        var endTime = time.stop();
+        chart.series[0].addPoint({
+            color: colors.shift(),
+            y: endTime
+        });
+        if (!list.length) {
+            log('测试已完成，请不要迷恋速度');
+            return;
+        }
+        target = list.shift();
+        log('正在测试: ' + target.name + '..');
+        setTimeout(function () {
+            comp(target);
+        }, 500);
+    };
+    var list = $.extend(true, {}, testList).list;
+    var target = list.shift();
+    log('正在测试: ' + target.name + '..');
+    comp(target)
+};
+    var startRender= function () {
+        var Timer = function (){
+            this.startTime = + new Date;
+        };
+        Timer.prototype.stop = function(){
+            return + new Date - this.startTime;
+        };
+        var colors = $.extend(true, [], Highcharts.getOptions().colors);
+        var categories = [];
+        for (var i = 0; i < testList.list.length; i ++) {
+            categories.push(testList.list[i].name);
+        }
+        var chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'container-render',
+                height: categories.length * 40,
+                type: 'bar'
+            },
+            title: {
+                text: '渲染速度'
+            },
+            subtitle: {
+                text: length + ' 条数据 × ' + number + ' 次渲染'
+            },
+            xAxis: {
+                categories: categories,
+                labels: {
+                    align: 'right',
+                    style: {
+                        fontSize: '12px',
+                        fontFamily: 'Verdana, sans-serif'
+                    }
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: '耗时(毫秒)'
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            tooltip: {
+                formatter: function() {
+                    return '<b>'+ this.x +'</b><br/>'+
+                    this.y + '毫秒';
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            plotOptions: {
+                bar: {
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function () {
+                            return this.y + 'ms';
+                        }
+                    }
+                }
+            },
+            series: [{
+                data : []
+            }]
+        });
+        var log = function (message) {
+            document.getElementById('log').innerHTML = message;
+        };
+        var render = function (target) {
+            var time = new Timer;
+            target.render();
+            var endTime = time.stop();
+            chart.series[0].addPoint({
+                color: colors.shift(),
+                y: endTime
+            });
+            if (!list.length) {
+                log('测试已完成，请不要迷恋速度');
+                return;
+            }
+            target = list.shift();
+            log('正在测试: ' + target.name + '..');
+            setTimeout(function () {
+                render(target);
+            }, 500);
+        };
+        var list = $.extend(true, {}, testList).list;
+        var target = list.shift();
+        log('正在测试: ' + target.name + '..');
+        render(target);
+    };
+    var startTest = function () {
+    var Timer = function (){
+        this.startTime = + new Date;
+    };
+    Timer.prototype.stop = function() {
+        return + new Date - this.startTime;
+    };
+    var colors = $.extend(true, [], Highcharts.getOptions().colors);
+    var categories = [];
+    for (var i = 0; i < testList.list.length; i ++) {
+        categories.push(testList.list[i].name);
+    }
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: 'container-test',
+            height: categories.length * 40,
+            type: 'bar'
+        },
+        title: {
+            text: 'JavaScript 模板引擎负荷测试'
+        },
+        subtitle: {
+            text: length + ' 条数据 × ' + number + ' 次渲染'
+        },
+        xAxis: {
+            categories: categories,
+            labels: {
+                align: 'right',
+                style: {
+                    fontSize: '12px',
+                    fontFamily: 'Verdana, sans-serif'
+                }
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: '耗时(毫秒)'
+            }
+        },
+        legend: {
+            enabled: false
+        },
+        tooltip: {
+            formatter: function() {
+                return '<b>'+ this.x +'</b><br/>'+this.y + '毫秒';
+            }
+        },
+        credits: {
+            enabled: false
+        },
+        plotOptions: {
+            bar: {
+                dataLabels: {
+                    enabled: true,
+                    formatter: function () {
+                        return this.y + 'ms';
+                    }
+                }
+            }
+        },
+        series: [{
+            data : []
+        }]
+    });
+    var log = function (message) {
+        document.getElementById('log').innerHTML = message;
+    };
+    var tester = function (target) {
+        var time = new Timer;
+        target.tester();
+        var endTime = time.stop();
+        chart.series[0].addPoint({
+            color: colors.shift(),
+            y: endTime
+        });
+        if (!list.length) {
+            log('测试已完成，请不要迷恋速度');
+            return;
+        }
+
+        target = list.shift();
+        log('正在测试: ' + target.name + '..');
+        setTimeout(function () {
+            tester(target);
+        }, 500);
+    };
+    var list = $.extend(true, {}, testList).list;
+    var target = list.shift();
+    log('正在测试: ' + target.name + '..');
+    tester(target);
+};
+</script>
+
+<!-- artTemplate 的模板 -->
+<script id="template" type="text/tmpl">
+<ul>
+<% for (i = 0, l = list.length; i < l; i ++) { %>
+<li><%=list[i].index%>. 用户: <%=list[i].user%>/ 网站：<%=list[i].site%></li>
+<% } %>
+</ul>
+</script>
+
+<!-- baidu-template 的模板 -->
+<script id="baidu-template" type="text/tmpl">
+<ul>
+<% for (var val, i = 0, l = list.length; i < l; i ++) { %>
+<% val = list[i]; %>
+<li><%:=val.index%>. 用户: <%:=val.user%>/ 网站：<%:=val.site%></li>
+<% } %>
+</ul>
+</script>
+
+<!-- easyTemplate 的模板 -->
+<script id="easyTemplate" type="text/tmpl">
+<ul>
+    <#list data.list as item>
+        <li>${item.index}. 用户: ${item.user}/ 网站：${item.site}</li>
+    </#list>
+</ul>
+</script>
+
+<!-- tmpl 的模板 -->
+<script id="tmpl" type="text/tmpl">
+<ul>
+    <% for (var val, i = 0, l = list.length; i < l; i ++) { %>
+        <% val = list[i]; %>
+        <li><%=val.index%>. 用户: <%=val.user%>/ 网站：<%=val.site%></li>
+    <% } %>
+</ul>
+</script>
+
+<!-- jqueryTmpl 的模板 -->
+<script id="jqueryTmpl" type="text/tmpl">
+<ul>
+    {{each list}}
+        <li>${$value.index}. 用户: ${$value.user}/ 网站：${$value.site}</li>
+    {{/each}}
+</ul>
+</script>
+
+<!--juicer 的模板 -->
+<script id="juicer" type="text/tmpl">
+<ul>
+    {@each list as val}
+        <li>$${val.index}. 用户: $${val.user}/ 网站：$${val.site}</li>
+    {@/each}
+</ul>
+</script>
+
+<!-- doT 的模板 -->
+<script id="doT" type="text/tmpl">
+<ul>
+    {{ for (var val, i = 0, l = it.list.length; i < l; i ++) { }}
+        {{ val = it.list; }}
+        <li>{{=val[i].index}}. 用户: {{=val[i].user}}/ 网站：{{=val[i].site}}</li>
+    {{ } }}
+</ul>
+</script>
+
+<!-- simplite 的模板 -->
+<script id="simplite" type="text/tmpl">
+<ul>
+    <% for (var val, i = 0, l = _this.list.length; i < l; i ++) { %>
+        <% val = _this.list[i]; %>
+        <li><%=val.index%>. 用户: <%=val.user%>/ 网站：<%=val.site%></li>
+    <% } %>
+</ul>
+</script>
+
+<!--Mustache 的模板 -->
+<script id="Mustache" type="text/tmpl">
+<ul>
+    {{#list}}
+        <li>{{{index}}}. 用户: {{{user}}}/ 网站：{{{site}}}</li>
+    {{/list}}
+</ul>
+</script>
+
+<!--Handlebars 的模板 -->
+<script id="Handlebars" type="text/tmpl">
+<ul>
+    {{#list}}
+        <li>{{{index}}}. 用户: {{{user}}}/ 网站：{{{site}}}</li>
+    {{/list}}
+</ul>
+</script>
+
+<!--kissy 的模板 -->
+<script id="kissy" type="text/tmpl">
+<ul>
+    {{#each list as val}}
+        <li>{{val.index}}. 用户: {{val.user}}/ 网站：{{val.site}}</li>
+    {{/each}}
+</ul>
+</script>
+
+
+<!-- ejs 的模板 -->
+<script id="ejs" type="text/tmpl">
+<ul>
+    <& for (var val, i = 0, l = @list.length; i < l; i ++) { &>
+        <& val = @list[i]; &>
+        <li> <&= val.index &>. 用户: <&= val.user &>； 网站：<&= val.site &></li>
+    <& } &>
+</ul>
+</script>
+
+<!-- underscore 的模板 -->
+<script id="underscoreTemplate" type="text/tmpl">
+<ul>
+    <% for (var i = 0, l = list.length; i < l; i ++) { %>
+        <li><%=list[i].index%>. 用户: <%=list[i].user%>/ 网站：<%=list[i].site%></li>
+    <% } %>
+</ul>
+</script>
+</head>
+<body>
+<h1>引擎渲染速度竞赛</h1>
+<p>
+    <strong><script>document.write(length)</script></strong>
+    条数据 × <strong><script>document.write(number)</script></strong>
+    次渲染测试 [isEscape:false, isCache:true]
+</p>
+<p>
+    <em>建议在拥有 v8 javascript 引擎的 chrome 浏览器上进行测试，避免浏览器停止响应</em>
+</p>
+<p>
+    <button id="button-comp" onclick="this.disabled=true;startComp()" style="padding: 5px;">开始测试 > 编译性能</button>
+    <button id="button-render" onclick="this.disabled=true;startRender()" style="padding: 5px;">开始测试 > 渲染性能</button>
+    <button id="button-test" onclick="this.disabled=true;startTest()" style="padding: 5px;">开始测试 > 编辑+渲染</button>
+    <span id="log" style="font-size:12px">
+        <script>for (var i = 0; i < testList.length; i ++) {document.write(testList[i].name + '; ')}</script>
+    </span>
+</p>
+<div id="container-test" style="min-width: 400px; margin: 0 auto"></div>
+<div id="container-render" style="min-width: 400px; margin: 0 auto"></div>
+<div id="container-comp" style="min-width: 400px; margin: 0 auto"></div>
+<div id="con-"></div>
+<div id="con-"></div>
+<div id="con-"></div>
+<div id="con-"></div>
+<div id="con-"></div>
+<div id="con-"></div>
+<div id="con-"></div>
+<div id="con-"></div>
+<div id="con-"></div>
+</body>
+</html>
