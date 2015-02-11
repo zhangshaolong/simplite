@@ -148,7 +148,7 @@
             // 处理子模板，未处理xxx.include情况
             js = js.replace(/(\W)?(include\s*\(([^\)]+)\))/g, function (all, pre, include, args) {
                 if (args.indexOf(',') < 0) { // 不应该有第一个字符为“,”的情况。
-                    args = args + ',_this';
+                    args = args + ',' + Simplite.dataKey;
                 }
                 return (pre || '') + 'out += Simplite.include(' + args + ')';
             });
@@ -219,8 +219,7 @@
         var dataLoader = templateCache[template];
         if (!dataLoader) {
             var code = parse(template);
-            dataLoader = templateCache[template] = new Function('obj', 'var ' + Simplite.dataKey + ' = obj;' + code
-                    + '; return out;');
+            dataLoader = templateCache[template] = new Function('_scopeData', 'var ' + Simplite.dataKey + ' = _scopeData;' + code + '; return out;');
         }
         return dataLoader;
     };
