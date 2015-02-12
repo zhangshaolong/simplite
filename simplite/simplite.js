@@ -73,6 +73,8 @@
         '\"': '\\"'
     };
 
+    var escapeHTMLReg = /\\|\"|&|<|>|"|'/g;
+
     /**
      * 对html元素进行转义
      * @private param {string} txt html字符串
@@ -85,7 +87,7 @@
         if (typeof txt !== 'string') {
             return txt;
         }
-        return txt.replace(/\\|\"|&|<|>|"|'/g, function (ch) {
+        return txt.replace(escapeHTMLReg, function (ch) {
             return htmlMeta[ch];
         });
     };
@@ -136,6 +138,15 @@
         return out;
     };
 
+    // 分析include子模板语法
+    var includeReg = /(^|[^\.\w\s])(\s*include\s*\(([^\)]+)\))/g;
+
+    // 分析是否添加分号的正则
+    var semicolonReg = /[^\{;]\s*$/;
+
+    // 分析属性的正则
+    var propertyReg = /^=\s*(.)/;
+
     /**
      * 逻辑标签处理器（当属性与逻辑使用相同标签时一起解析）
      * @private param {string} js 代码逻辑或者属性
@@ -145,18 +156,17 @@
     var logicHandler = function (js, html) {
         var out = '';
         if (js) {
-            // 处理子模板，未处理xxx.include情况
-            js = js.replace(/(\W)?(include\s*\(([^\)]+)\))/g, function (all, pre, include, args) {
+            js = js.replace(includeReg, function (all, pre, include, args) {
                 if (args.indexOf(',') < 0) { // 不应该有第一个字符为“,”的情况。
                     args = args + ',' + Simplite.dataKey;
                 }
                 return (pre || '') + 'out += Simplite.include(' + args + ')';
             });
-            if (/[^\{;]\s*$/.test(js)) {
+            if (semicolonReg.test(js)) {
                 js += '\n'; // 为没有分号的情况添加换行，利用浏览器解析token
             }
             if (isSameTag()) {
-                if (/^=\s*(.)/.test(js)) { // 是否是获取数据
+                if (propertyReg.test(js)) { // 是否是获取数据
                     if (RegExp.$1 === '#') { // 此数据需要html转义
                         js = 'out += Simplite.escapeHTML(' + js.substr(2) + ');';
                     } else {
@@ -218,8 +228,7 @@
     var compile = function (template) {
         var dataLoader = templateCache[template];
         if (!dataLoader) {
-            var code = parse(template);
-            dataLoader = templateCache[template] = new Function('_scopeData', 'var ' + Simplite.dataKey + ' = _scopeData;' + code + '; return out;');
+            dataLoader = templateCache[template] = new Function(Simplite.dataKey, parse(template) + 'return out;');
         }
         return dataLoader;
     };
@@ -232,8 +241,7 @@
      * @return {string} 返回使用data数据填充好模板的html字符串
      */
     var include = function (template, data) {
-        template = getTemplate(template);
-        return toHtml(template, data);
+        return toHtml(getTemplate(template), data);
     };
 
     /**
