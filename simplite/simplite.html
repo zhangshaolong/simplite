@@ -67,7 +67,7 @@
 	4. 模板进行了编译缓存，对同一个模板进行一次编译。<br />
 	5. 支持无限嵌套子模板，支持嵌入多个子模板，方便重用通用模板。<br />
 	6. 子模板可以获取父模板的数据，默认include子模板的时候，会把父模板的数据结构传入，如果想传入部分父数据，可以设置到第二个参数。<br />
-	7. 模板可以使用_this来获取传入的数据。<br />
+	7. 模板可以使用Simplite.dataKey指定的字段（默认为"_this"）来获取传入的数据。<br />
 	8. 支持面向对象方式与静态方式的使用。<br />
 	9. 面向对象方式支持实现beforerender和afterrender接口，来监听对应的事件。<br />
 	10. 任意位置导入模板，支持动态条件导入模板，支持调用作用域内的任何函数。<br />
@@ -97,7 +97,7 @@
 		Simplite.compile<br />
 		Simplite.toHtml<br />
 		Simplite.render<br />
-		子模板导入：&lt;%include(subSubTemplate, data)%&gt;data是可选的，可以使用_this访问传过来的数据；如果不设置，会自动继承父模板的数据<br />
+		子模板导入：&lt;%include(subSubTemplate, data)%&gt;data是可选的，可以使用Simplite.dataKey指定的字段(默认为"_this")访问传过来的数据；如果不设置，会自动继承父模板的数据<br />
 		使用&lt;%for () {%&gt;写逻辑语句，使用&lt;%=abc%&gt;来设置属性的值（不对HTML转码），使用&lt;%=#abc%&gt;来设置属性的值（对HTML转码）
 </pre>
 </script>
