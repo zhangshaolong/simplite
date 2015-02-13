@@ -6,33 +6,33 @@
 </head>
 <body>
 <div id="div"></div>
-<script type="text/html" id="oneArgTeplate">
+<script type="text/html" id="oneArgTemplate">
     <li>
 	   
         测试没有传递数据的情况：<%=_this%>
     </li>
 </script>
-<script type="text/html" id="subSubTeplate">
+<script type="text/html" id="subSubTemplate">
     <li>
         <%=
             _this
         %>
         <%
-            include(oneArgTeplate);
-            include('oneArgTeplate', new Date().getTime());
+            include(oneArgTemplate);
+            include('oneArgTemplate', (function(){return 333;})());
         %>
     </li>
     
 </script>
-<script type="text/html" id="subTeplate">
+<script type="text/html" id="subTemplate">
     <%
         for(var i=0;i<5;i++){
-            include(subSubTeplate, i);
+            include(subSubTemplate, i);
         }
     %>
 	<li><%=_this.id%>----<%=_this.name%></li>
 </script>
-<script type="text/html" id="rootTeplate">
+<script type="text/html" id="rootTemplate">
 	<ul>
 		<%for(var i=0;i<_this.length;i++){
             var obj = _this[i];
@@ -40,7 +40,7 @@
 			<li><%=obj.name%></li>
 			<% 
                     if (obj.id % 2) {
-                        include(subTeplate, obj);
+                        include(subTemplate, obj);
                     }
                 }
             %>
@@ -64,7 +64,7 @@
 	];
 	var rootTeplate = new Simplite({
 		target : 'div',
-		template : 'rootTeplate'
+		template : 'rootTemplate'
 	});
 	rootTeplate.beforerender = function(data) {
 		console.log(data)

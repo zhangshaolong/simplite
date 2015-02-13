@@ -139,7 +139,7 @@
     };
 
     // 分析include子模板语法
-    var includeReg = /(^|[^\.\w\s])(\s*include\s*\(([^\)]+)\))/g;
+    var includeReg = /(^|[^\.\w\s])(\s*include\s*\(([^;]+)\))/g;
 
     // 分析是否添加分号的正则
     var semicolonReg = /[^\{;]\s*$/;
