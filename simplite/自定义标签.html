@@ -6,16 +6,16 @@
 </head>
 <body>
     <div id="ulDiv"></div>
-    <script type="text/html" id="liTeplate">
+    <script type="text/html" id="liTemplate">
 	<li>${_data_.id}----${_data_.name}</li>
 </script>
-    <script type="text/html" id="ulTeplate">
+    <script type="text/html" id="ulTemplate">
 	<ul>
 		<!--for(var i=0;i<_data_.length;i++){
             var obj = _data_[i];
         -->
             <li>${obj.name}</li>
-            <!-- include(liTeplate, obj)-->
+            <!-- include(liTemplate, obj)-->
 		<!--}-->
 	<ul>
 </script>
@@ -37,17 +37,17 @@
         // 最好不要使用}作为闭合标签，因为这个很可能和其他地方有冲突，推荐}}
         Simplite.attrCloseTag = '}';
         Simplite.dataKey = '_data_';
-        var ulTeplate = new Simplite({
+        var ulTemplate = new Simplite({
             target : 'ulDiv',
-            template : 'ulTeplate'
+            template : 'ulTemplate'
         });
-        ulTeplate.beforerender = function(data) {
+        ulTemplate.beforerender = function(data) {
             console.log(data)
         };
-        ulTeplate.afterrender = function(node) {
+        ulTemplate.afterrender = function(node) {
             console.log(node)
         };
-        ulTeplate.render(ulData);
+        ulTemplate.render(ulData);
     </script>
 </body>
 </html>

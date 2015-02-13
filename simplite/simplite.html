@@ -76,17 +76,17 @@
     <script type="text/html" id="subSubTemplate1">
 <pre>
 	使用方式：<br />
-		var tableTeplate = new Simplite({
+		var tableTemplate = new Simplite({
 			target: 'tableDiv',
-			template: 'tableTeplate'
+			template: 'tableTemplate'
 		});<br />
 		target是显示模板结构的dom元素，可以是ID、Dom或jQuery元素<br />
 		template是模板元素（可以是ID、Dom或jQuery元素）；或者模板内容<br />
-		tableTeplate.beforerender = function(data){console.log(data)};<br />
+		tableTemplate.beforerender = function(data){console.log(data)};<br />
 		注册beforerender事件。<br />
-		tableTeplate.afterrender = function(node){console.log(node)};<br />
+		tableTemplate.afterrender = function(node){console.log(node)};<br />
 		注册afterrender事件。<br />
-		tableTeplate.render(tableData);<br />
+		tableTemplate.render(tableData);<br />
 		根据tableData数据渲染模板<br />
 		提供的静态属性或方法有：<br />
 		Simplite.openTag<br />
@@ -102,7 +102,7 @@
 </pre>
 </script>
     <div id="tableDiv"></div>
-    <script type="text/html" id="tableTeplate">
+    <script type="text/html" id="tableTemplate">
 	<%
 	include(subTemplate);
 	//动态条件导入模板
@@ -147,17 +147,17 @@
                                     [ '7', '张三', '22' ], [ '8', '张三', '26' ] ]
                         }
                     }
-                    var tableTeplate = new Simplite({
+                    var tableTemplate = new Simplite({
                         target : 'tableDiv',
-                        template : 'tableTeplate'
+                        template : 'tableTemplate'
                     });
-                    tableTeplate.beforerender = function(data) {
+                    tableTemplate.beforerender = function(data) {
                         console.log(data)
                     };
-                    tableTeplate.afterrender = function(node) {
+                    tableTemplate.afterrender = function(node) {
                         console.log(node)
                     };
-                    tableTeplate.render(tableData);
+                    tableTemplate.render(tableData);
                 </script>
 </body>
 </html>
