@@ -139,7 +139,7 @@
     };
 
     // 分析include子模板语法
-    var includeReg = /(^|[^\.\w\s])(\s*include\s*\(([^;]+)\))/g;
+    var includeReg = /(^|[^\s])(\s*include\s*\(([^;]+)\))/g;
 
     // 分析是否添加分号的正则
     var semicolonReg = /[^\{;]\s*$/;
@@ -157,10 +157,13 @@
         var out = '';
         if (js) {
             js = js.replace(includeReg, function (all, pre, include, args) {
+                if (pre === '.') {
+                    return all;
+                }
                 if (args.indexOf(',') < 0) { // 不应该有第一个字符为“,”的情况。
                     args = args + ',' + Simplite.dataKey;
                 }
-                return (pre || '') + 'out += Simplite.include(' + args + ')';
+                return (pre || '') + ' out += Simplite.include(' + args + ')';
             });
             if (semicolonReg.test(js)) {
                 js += '\n'; // 为没有分号的情况添加换行，利用浏览器解析token

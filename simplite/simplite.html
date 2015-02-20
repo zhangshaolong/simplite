@@ -108,8 +108,8 @@
 	//动态条件导入模板
 	var time = new Date().getTime();//include('subTemplate2') ;
 	if(time % 2) {include(subTemplate2, time);}
-	else include(subTemplate3, time);
-	%>
+	else %><%=window.include(subTemplate3);%>
+	
 	<table class='grid'>
 		<thead>
 			<tr>
@@ -136,6 +136,9 @@
 </script>
     <script src="simplite.js"></script>
     <script>
+         window.include = function () {
+                        return '<div>afdsdfsdf</div>';
+                    }
                     var tableData = {
                         thead : {
                             tr : [ 'ID', '姓名', '年龄' ]
@@ -158,6 +161,7 @@
                         console.log(node)
                     };
                     tableTemplate.render(tableData);
+                   
                 </script>
 </body>
 </html>
