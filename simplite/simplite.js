@@ -8,13 +8,32 @@
         define(function () {
             return simplite;
         });
-    } else {
+    } else if (typeof require === 'undefined') {
         root.Simplite = simplite;
+    } else { // node端接口
+        root.logicOpenTag = simplite.logicOpenTag;
+        root.logicCloseTag = simplite.logicCloseTag;
+        root.attrOpenTag = simplite.attrOpenTag;
+        root.attrCloseTag = simplite.attrCloseTag;
+        root.dataKey = simplite.dataKey;
+        root.escapeHTML = simplite.escapeHTML;
+        root.getTemplate = simplite.getTemplate;
+        root.addFilter = simplite.addFilter;
+        root.include = simplite.include;
+        root.filter = simplite.filter;
+        root.compile = simplite.compile;
+        root.toHtml = simplite.toHtml;
+        root.render = simplite.render;
     }
 })(this, function () {
-
+    'use strict'
     // 模板编译缓存
     var templateCache = {};
+
+    // 注入的过滤函数集合
+    var filterMethods = {};
+
+    var slice = Array.prototype.slice;
 
     var isType = function (type) {
         var toString = Object.prototype.toString;
@@ -58,8 +77,15 @@
         }
     };
 
+    var qReg = /('|\\)/g;
+    var rReg = /\r/g;
+    var nReg = /\n/g;
+    var qStrfy = '\\$1';
+    var rStrfy = '\\r';
+    var nStrfy = '\\n';
+
     var stringify = function (code) {
-        return "'" + code.replace(/('|\\)/g, '\\$1').replace(/\r/g, '\\r').replace(/\n/g, '\\n') + "'";
+        return "'" + code.replace(qReg, qStrfy).replace(rReg, rStrfy).replace(nReg, nStrfy) + "'";
     };
 
     // 转义对应表
@@ -68,12 +94,11 @@
         '<': '&lt;',
         '>': '&gt;',
         '"': '&quot;',
-        "'": '&#39;',
-        '\\': '\\\\',
-        '\"': '\\"'
+        '\'': '&#39;',
+        '\\': '\\\\'
     };
 
-    var escapeHTMLReg = /\\|\"|&|<|>|"|'/g;
+    var escapeReg = /\\|&|<|>|"|'/g;
 
     /**
      * 对html元素进行转义
@@ -87,7 +112,7 @@
         if (typeof txt !== 'string') {
             return txt;
         }
-        return txt.replace(escapeHTMLReg, function (ch) {
+        return txt.replace(escapeReg, function (ch) {
             return htmlMeta[ch];
         });
     };
@@ -138,8 +163,8 @@
         return out;
     };
 
-    // 分析include子模板语法
-    var includeReg = /(^|[^\s])(\s*include\s*\(([^;]+)\))/g;
+    // 分析关键词语法
+    var keywordReg = /(^|[^\s])\s*(include|filter)\s*\(([^;]+)\)/g;
 
     // 分析是否添加分号的正则
     var semicolonReg = /[^\{;]\s*$/;
@@ -156,14 +181,14 @@
     var logicHandler = function (js, html) {
         var out = '';
         if (js) {
-            js = js.replace(includeReg, function (all, pre, include, args) {
+            js = js.replace(keywordReg, function (all, pre, keyword, args) {
                 if (pre === '.') {
                     return all;
                 }
-                if (args.indexOf(',') < 0) { // 不应该有第一个字符为“,”的情况。
+                if (args.indexOf(',') < 0) {
                     args = args + ',' + Simplite.dataKey;
                 }
-                return (pre || '') + ' out += Simplite.include(' + args + ')';
+                return (pre || '') + ' out += Simplite.' + keyword + '(' + args + ')';
             });
             if (semicolonReg.test(js)) {
                 js += '\n'; // 为没有分号的情况添加换行，利用浏览器解析token
@@ -248,6 +273,27 @@
     };
 
     /**
+     * 添加处理过滤数据方法
+     * @private
+     * @param {string} name 需要调用的方法名称
+     * @param {*} ... 传入方法的不定长参数
+     * @return {string} 返回过滤之后的结果
+     */
+    var filter = function (name) {
+        return filterMethods[name].apply(null, slice.call(arguments, 1));
+    };
+
+    /**
+     * 为模板引擎注入过滤方法
+     * @private
+     * @param {string} name 注入的方法名称
+     * @param {Function} fun 注入的方法
+     */
+    var addFilter = function (name, fun) {
+        filterMethods[name] = fun;
+    };
+
+    /**
      * 向模板填充数据
      * @private
      * @param {string} template 模板html
@@ -308,8 +354,7 @@
      * @event
      * @param {Object} 用来渲染模板的数据
      */
-    Simplite.prototype.beforerender = function (data) {
-    };
+    Simplite.prototype.beforerender = function (data) {};
 
     /**
      * 模板渲染后事件
@@ -334,7 +379,9 @@
     Simplite.dataKey = '_this';
     Simplite.escapeHTML = escapeHTML;
     Simplite.getTemplate = getTemplate;
+    Simplite.addFilter = addFilter;
     Simplite.include = include;
+    Simplite.filter = filter;
     Simplite.compile = compile;
     Simplite.toHtml = toHtml;
     Simplite.render = render;

@@ -9,7 +9,7 @@
 <script type="text/html" id="oneArgTemplate">
     <li>
 	   
-        测试没有传递数据的情况：<%=_this%>
+        测试没有传递数据的情况：<% filter('abc', _this);%>
     </li>
 </script>
 <script type="text/html" id="subSubTemplate">
@@ -42,12 +42,21 @@
                     if (obj.id % 2) {
                         include(subTemplate, obj);
                     }
+                    
+                    filter('def', obj.name, obj.id);
                 }
+                
             %>
 	<ul>
 </script>
 <script src="simplite.js"></script>
 <script>
+    Simplite.addFilter('abc', function (name) {
+        return '<span style="color: blue;">' + name + '</span>';
+    })
+    Simplite.addFilter('def', function (name, id) {
+        return '<span style="color: red;">' + name + id + '</span>';
+    })
 	var rootData = [
 		{
 			id: 1,
