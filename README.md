@@ -12,4 +12,8 @@
     - 8：支持子模板使用Simplite.dataKey指定的字段访问传递过来的数据全集，默认值为"_this"，对于数组、数字这样的数据集来说，使用Simplite.dataKey很容易拿到数据。
     - 9：支持面向对象方式使用模板和纯静态函数方式来手动组织模板处理过程。
     - 10：支持除了访问父模板数据外，还可以提供方法作用域内任何数据为数据集，比如在全局有个arr，那么可以include(tmplt, arr)来指定。
+    - 11：支持对数据进行过滤处理，使用关键字filter(name, datas...)方式进行调用，其中name为Simplite.addFilter(name, fun)的name注册的方法
+    
+- 使用说明：
+    http://www.cnblogs.com/centre/p/4288757.html
 
