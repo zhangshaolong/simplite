@@ -152,7 +152,7 @@
         var out = '';
         if (attr) {
             if (attr.indexOf('#') === 0) {
-                out += 'out += Simplite.escapeHTML(' + attr.substr(1) + ');';
+                out += 'out += this.escapeHTML(' + attr.substr(1) + ');';
             } else {
                 out += 'out += ' + attr + ';';
             }
@@ -188,7 +188,7 @@
                 if (args.indexOf(',') < 0) {
                     args = args + ',' + Simplite.dataKey;
                 }
-                return (pre || '') + ' out += Simplite.' + keyword + '(' + args + ')';
+                return (pre || '') + ' out += this.' + keyword + '(' + args + ')';
             });
             if (semicolonReg.test(js)) {
                 js += '\n'; // 为没有分号的情况添加换行，利用浏览器解析token
@@ -196,7 +196,7 @@
             if (isSameTag()) {
                 if (propertyReg.test(js)) { // 是否是获取数据
                     if (RegExp.$1 === '#') { // 此数据需要html转义
-                        js = 'out += Simplite.escapeHTML(' + js.substr(2) + ');';
+                        js = 'out += this.escapeHTML(' + js.substr(2) + ');';
                     } else {
                         js = 'out += ' + js.substr(1) + ';';
                     }
@@ -256,7 +256,11 @@
     var compile = function (template) {
         var dataLoader = templateCache[template];
         if (!dataLoader) {
-            dataLoader = templateCache[template] = new Function(Simplite.dataKey, parse(template) + 'return out;');
+            var compileFun = new Function(Simplite.dataKey, parse(template) + 'return out;');
+            dataLoader = (compileFun.bind ? compileFun.bind(Simplite) : function () {
+                return compileFun.apply(Simplite, slice.call(arguments));
+            });
+            templateCache[template] = dataLoader;
         }
         return dataLoader;
     };
@@ -301,6 +305,7 @@
      * @return {string} 返回使用data数据填充好模板的html字符串
      */
     var toHtml = function (template, data) {
+        console.log(data)
         return compile(template)(data);
     };
 
