@@ -253,12 +253,13 @@
      * @private
      * @return {Function(Object)} 返回根据html模板编译好的处理函数
      */
-    var compile = function (template) {
+    var compile = function (template, simplite) {
         var dataLoader = templateCache[template];
         if (!dataLoader) {
+            simplite = simplite || Simplite;
             var compileFun = new Function(Simplite.dataKey, parse(template) + 'return out;');
-            dataLoader = (compileFun.bind ? compileFun.bind(Simplite) : function () {
-                return compileFun.apply(Simplite, slice.call(arguments));
+            dataLoader = (compileFun.bind ? compileFun.bind(simplite) : function () {
+                return compileFun.apply(simplite, slice.call(arguments));
             });
             templateCache[template] = dataLoader;
         }
@@ -284,7 +285,7 @@
      * @return {string} 返回过滤之后的结果
      */
     var filter = function (name) {
-        return filterMethods[name].apply(null, slice.call(arguments, 1));
+        return (this.filterMethods || filterMethods)[name].apply(null, slice.call(arguments, 1));
     };
 
     /**
@@ -292,9 +293,14 @@
      * @private
      * @param {string} name 注入的方法名称
      * @param {Function} fun 注入的方法
+     * @param {Object?} simplite 当前的simplite实例
      */
-    var addFilter = function (name, fun) {
-        filterMethods[name] = fun;
+    var addFilter = function (name, fun, simplite) {
+        if (simplite) {
+            simplite.filterMethods[name] = fun;
+        } else {
+            filterMethods[name] = fun;
+        }
     };
 
     /**
@@ -305,7 +311,6 @@
      * @return {string} 返回使用data数据填充好模板的html字符串
      */
     var toHtml = function (template, data) {
-        console.log(data)
         return compile(template)(data);
     };
 
@@ -332,6 +337,7 @@
     var Simplite = function (options) {
         this.target = getNode(options.target);
         this.template = getTemplate(options.template);
+        this.filterMethods = {};
     };
 
     /**
@@ -340,7 +346,7 @@
      * @return {Function(Object)} 返回根据html模板编译好的处理函数
      */
     Simplite.prototype.compile = function () {
-        return compile(this.template);
+        return compile(this.template, this);
     };
 
     /**
@@ -351,6 +357,26 @@
     Simplite.prototype.render = function (data) {
         this.beforerender(data);
         render(this.target, toHtml(this.template, data), this.afterrender);
+    };
+
+    /**
+     * 以实例为单位的filter注册方法，不会干扰其他实例的相同name的filter
+     * @public
+     * @param {string} name 注入的方法名称
+     * @param {Function} fun 注入的方法
+     */
+    Simplite.prototype.addFilter = function (name, fun) {
+        addFilter.call(this, name, fun);
+    };
+
+    /**
+     * 为引擎提供可以引用到当前实例下的filter的name
+     * @public
+     * @param {string} name 注入的方法名称
+     * @param {*} ... 传入方法的不定长参数
+     */
+    Simplite.prototype.filter = function (name) {
+        filter.apply(this, arguments);
     };
 
     /**
