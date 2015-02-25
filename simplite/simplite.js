@@ -241,7 +241,8 @@
 
     /**
      * html模板解析
-     * @private param {string} text html模板
+     * @private 
+     * @param {string} text html模板
      * @return {string} 返回根据html模板转换为可运行js的字符串形式
      */
     var parse = function (text) {
@@ -251,6 +252,8 @@
     /**
      * html模板编译
      * @private
+     * @param {string} template 要被编译的html片段
+     * @param {Simplite?} simplite Simplite的实例对象
      * @return {Function(Object)} 返回根据html模板编译好的处理函数
      */
     var compile = function (template, simplite) {
@@ -293,7 +296,7 @@
      * @private
      * @param {string} name 注入的方法名称
      * @param {Function} fun 注入的方法
-     * @param {Object?} simplite 当前的simplite实例
+     * @param {Simplite?} simplite 当前的Simplite实例
      */
     var addFilter = function (name, fun, simplite) {
         if (simplite) {
@@ -371,7 +374,7 @@
 
     /**
      * 为引擎提供可以引用到当前实例下的filter的name
-     * @public
+     * @private
      * @param {string} name 注入的方法名称
      * @param {*} ... 传入方法的不定长参数
      */
