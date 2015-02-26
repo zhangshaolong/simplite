@@ -28,7 +28,10 @@
 })(this, function () {
     'use strict'
     // 模板编译缓存
-    var templateCache = {};
+    var compileCache = {};
+
+    // 注入的模板集合
+    var templates = {};
 
     // 注入的过滤函数集合
     var filterMethods = {};
@@ -54,7 +57,7 @@
      */
     var getNode = function (idOrNode) {
         if (isString(idOrNode)) {
-            return document.getElementById(idOrNode);
+            return typeof document !== 'undefined' ? document.getElementById(idOrNode) : null;
         } else if (idOrNode.nodeName) {
             return idOrNode;
         } else {
@@ -257,14 +260,14 @@
      * @return {Function(Object)} 返回根据html模板编译好的处理函数
      */
     var compile = function (template, simplite) {
-        var dataLoader = templateCache[template];
+        var dataLoader = compileCache[template];
         if (!dataLoader) {
             simplite = simplite || Simplite;
             var compileFun = new Function(Simplite.dataKey, parse(template) + 'return out;');
             dataLoader = (compileFun.bind ? compileFun.bind(simplite) : function () {
                 return compileFun.apply(simplite, slice.call(arguments));
             });
-            templateCache[template] = dataLoader;
+            compileCache[template] = dataLoader;
         }
         return dataLoader;
     };
@@ -374,7 +377,7 @@
 
     /**
      * 为引擎提供可以引用到当前实例下的filter的name
-     * @private
+     * @public
      * @param {string} name 注入的方法名称
      * @param {*} ... 传入方法的不定长参数
      */
