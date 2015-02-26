@@ -15,5 +15,5 @@
     - 11：支持对数据进行过滤处理，使用关键字filter(name, datas...)方式进行调用，其中name为Simplite.addFilter(name, fun)的name注册的方法
     
 - 使用说明：
-    http://www.cnblogs.com/centre/p/4288757.html
+    http://www.cnblogs.com/centre/p/4299198.html
 
