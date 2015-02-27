@@ -17,7 +17,7 @@
 <script src="http://jstemplates.sinaapp.com/js/jquery.tmpl.js"></script>
 <script src="http://jstemplates.sinaapp.com/js/easytemplate.js"></script>
 <script src="http://jstemplates.sinaapp.com/js/underscore.js"></script>
-<script src="./simplite.js"></script>
+<script src="./simplite-core.js"></script>
 <script>
 // 数据量
 var length = 100;
@@ -120,25 +120,28 @@ var testList = {list: [
         name: 'simplite',
         tester: function () {
             var source = document.getElementById('simplite').innerHTML;
+            Simplite.addTemplate('test', source);
+            var render = Simplite.render;
             var compile = Simplite.compile;
-            var render = compile(source);
             for (var i = 0; i < number; i ++) {
-                var render = compile(source);
-                render(data);
+                compile('test');
+                render('test', data);
             }
         },
         comp: function () {
             var source = document.getElementById('simplite').innerHTML;
+            Simplite.addTemplate('test', source);
             var compile = Simplite.compile;
             for (var i = 0; i < number; i ++) {
-                var render = compile(source);
+                var render = compile('test');
             }
         },
         render: function () {
             var source = document.getElementById('simplite').innerHTML;
-            var render = Simplite.compile(source);
+            Simplite.addTemplate('test', source);
+            var render = Simplite.render;
             for (var i = 0; i < number; i ++) {
-                render(data);
+                render('test', data);
             }
         }
     },
