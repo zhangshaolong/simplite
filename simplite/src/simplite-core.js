@@ -29,7 +29,7 @@
     // 默认逻辑闭合标签
     var logicCloseTag = '%>';
     // 默认属性开始标签
-    var attrOpenTag = '<%';
+    var attrOpenTag = '<%=';
     // 默认属性闭合标签
     var attrCloseTag = '%>';
     // 默认使用_this作为传入数据的载体，可以使用_this.a获取数据中的a属性的值
@@ -68,13 +68,6 @@
 
     var slice = Array.prototype.slice;
 
-    var isType = function (type) {
-        var toString = Object.prototype.toString;
-        return function (target) {
-            return toString.call(target) === '[object ' + type + ']';
-        };
-    };
-
     var maxin = function (from, to) {
         for (var key in from) {
             if (!to[key]) {
@@ -82,154 +75,6 @@
             }
         }
         return to;
-    };
-    
-    var isString = isType('String');
-
-    var isArray = isType('Array');
-
-    var stringify = function () {
-        var qReg = /('|\\)/g;
-        var rReg = /\r/g;
-        var nReg = /\n/g;
-        var qStrfy = '\\$1';
-        var rStrfy = '\\r';
-        var nStrfy = '\\n';
-        return function (code) {
-            return "'" + code.replace(qReg, qStrfy).replace(rReg, rStrfy).replace(nReg, nStrfy) + "'";
-        };
-    }();
-
-    /**
-     * 解析开始标签
-     * @private param {string} text html模板
-     * @return {Array.<string>} 返回根据开始标签分割的数组
-     */
-    var parseOpenTag = function (text, openTag) {
-        return text.split(openTag);
-    };
-
-    /**
-     * 解析闭合标签
-     * @private param {string} segment html模板段
-     * @return {Array.<string>} 返回根据闭合标签分割的数组
-     */
-    var parseCloseTag = function (segment, closeTag) {
-        return segment.split(closeTag);
-    };
-
-    /**
-     * 是否逻辑标签和属性标签使用一套 （注意：针对部分一致的标签可能会造成解析问题）
-     */
-    var isSameTag = function () {
-        return Simplite.attrOpenTag === Simplite.logicOpenTag && Simplite.attrCloseTag === Simplite.logicCloseTag
-    };
-
-    /**
-     * 自定义属性标签处理器
-     * @private param {string} attr 属性
-     * @private param {string} html 没有属性的html片段
-     * @return {string} 返回解析好的js代码段
-     */
-    var customAttrHandler = function (attr, html) {
-        var out = '';
-        if (attr) {
-            if (attr.indexOf('#') === 0) {
-                out += 'out += this.filter("escape", ' + attr.substr(1) + ');';
-            } else {
-                out += 'out += ' + attr + ';';
-            }
-        }
-        if (html) {
-            out += 'out += ' + stringify(html) + ';';
-        }
-        return out;
-    };
-
-    // 分析关键词语法
-    var keywordReg = /(^|[^\s])\s*(include|filter)\s*\(([^;]+)\)/g;
-
-    // 分析是否添加分号的正则
-    var semicolonReg = /[^\{;]\s*$/;
-
-    // 分析属性的正则
-    var propertyReg = /^=\s*(.)/;
-
-    /**
-     * 逻辑标签处理器（当属性与逻辑使用相同标签时一起解析）
-     * @private param {string} js 代码逻辑或者属性
-     * @private param {string} html 可能包含自定义属性标签的html片段
-     * @return {string} 返回解析好的js代码段
-     */
-    var logicHandler = function (js, html) {
-        var out = '';
-        if (js) {
-            js = js.replace(keywordReg, function (all, pre, keyword, args) {
-                if (pre === '.') {
-                    return all;
-                }
-                if (args.indexOf(',') < 0) {
-                    args = args + ',' + Simplite.dataKey;
-                }
-                return (pre || '') + ' out += this.' + keyword + '(' + args + ')';
-            });
-            if (semicolonReg.test(js)) {
-                js += '\n'; // 为没有分号的情况添加换行，利用浏览器解析token
-            }
-            if (isSameTag()) {
-                if (propertyReg.test(js)) { // 是否是获取数据
-                    if (RegExp.$1 === '#') { // 此数据需要html转义
-                        js = 'out += this.filter("escape", ' + js.substr(2) + ');';
-                    } else {
-                        js = 'out += ' + js.substr(1) + ';';
-                    }
-                }
-            }
-            out += js;
-        }
-        if (html) {
-            if (!isSameTag()) {// 处理自定义属性标签
-                out += parse2Block(html, Simplite.attrOpenTag, Simplite.attrCloseTag, customAttrHandler);
-            } else {
-                out += 'out += ' + stringify(html) + ';';
-            }
-        }
-        return out;
-    };
-
-    /**
-     * 模板逻辑和属性标签处理器
-     * @private param {string} text 处理文本
-     * @private param {string} openTag 开始标签
-     * @private param {string} openTag 闭合标签
-     * @private param {Function} hanlder 具体根据解析生成语句段的处理器
-     * @return {string} 返回解析好的js代码段
-     */
-    var parse2Block = function (text, openTag, closeTag, hanlder) {
-        var out = '';
-        var segments = parseOpenTag(text, openTag);
-        for (var i = 0, len = segments.length; i < len; i++) {
-            var segment = segments[i];
-            var jsAndHtml = parseCloseTag(segment, closeTag);
-            var js = jsAndHtml[0];
-            var html = jsAndHtml[1];
-            if (html === undefined) {
-                html = js;
-                js = '';
-            }
-            out += hanlder(js, html);
-        }
-        return out;
-    };
-
-    /**
-     * html模板解析
-     * @private 
-     * @param {string} text html模板
-     * @return {string} 返回根据html模板转换为可运行js的字符串形式
-     */
-    var parse = function (text) {
-        return 'var out = "";' + parse2Block(text, Simplite.logicOpenTag, Simplite.logicCloseTag, logicHandler);
     };
 
     /**
@@ -291,7 +136,7 @@
      * @return {string} 返回过滤之后的结果
      */
     Simplite.filter = function (name) {
-        return this.filters[name].apply(null, slice.call(arguments, 1));
+        return this.filters[name].apply(this, slice.call(arguments, 1));
     };
     /**
      * 引入子模板
@@ -303,14 +148,34 @@
     Simplite.include = function (name, data) {
         return Simplite.render(name, data, this);
     };
-    
+    // 分析关键词语法
+    var keywordReg = /(^|[^\s])\s*(include|filter)\s*\(([^;]+)\)/g;
+
     Simplite.compile = function (name, simplite) {
         simplite = simplite || Simplite;
         var renderer = simplite.compiles[name];
         if (renderer) {
             return renderer;
         }
-        renderer = new Function(simplite.dataKey, parse(simplite.templates[name]) + 'return out;');
+        var attrTagReg = new RegExp(simplite.attrOpenTag + '(.+?)' + simplite.attrCloseTag, 'g');
+        var logicOpenTagReg = new RegExp(simplite.logicOpenTag, 'g');
+        var logicCloseTagReg = new RegExp(simplite.logicCloseTag, 'g');
+        var blankReg = /\s+/g;
+        var html = simplite.templates[name].replace(blankReg, ' ').replace(attrTagReg, function (all, p) {
+            if (p.charAt(0) === '#') {
+                return '"+this.filter("escape",' + p.substr(1) + ')+"';
+            }
+            return '"+' + p+ '+"';
+        }).replace(logicCloseTagReg, 'out+="').replace(logicOpenTagReg, '";').replace(keywordReg, function (all, pre, keyword, args) {
+            if (pre === '.') {
+                return all;
+            }
+            if (args.indexOf(',') < 0) {
+                args = args + ',' + Simplite.dataKey;
+            }
+            return (pre || '') + ' out+=this.' + keyword + '(' + args + ');';
+        });
+        renderer = new Function (simplite.dataKey, 'var out = "' + html + '";return out;');
         return simplite.compiles[name] = (renderer.bind ? renderer.bind(simplite) : function () {
             return renderer.apply(simplite, slice.call(arguments));
         });
