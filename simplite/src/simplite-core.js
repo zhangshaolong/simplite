@@ -17,6 +17,7 @@
         root.attrCloseTag = simplite.attrCloseTag;
         root.dataKey = simplite.dataKey;
         root.addFilter = simplite.addFilter;
+        root.addTemplate = simplite.addTemplate;
         root.include = simplite.include;
         root.filter = simplite.filter;
         root.compile = simplite.compile;
@@ -34,6 +35,7 @@
     var attrCloseTag = '%>';
     // 默认使用_this作为传入数据的载体，可以使用_this.a获取数据中的a属性的值
     var dataKey = '_this';
+    var hasBind = typeof Function.bind === 'function';
     //默认的过滤器
     var filters = {
         escape: function () {
@@ -95,19 +97,20 @@
         this.dataKey = options.dataKey || dataKey;
         this.compiles = {};
     };
+
     // 编译过的模板的集合
     Simplite.compiles = {};
     // 注入的过滤器集合
     Simplite.filters = filters;
     // 注入的模板集合
     Simplite.templates = {};
+
     Simplite.logicOpenTag = logicOpenTag;
     Simplite.logicCloseTag = logicCloseTag;
     Simplite.attrOpenTag = attrOpenTag;
     Simplite.attrCloseTag = attrCloseTag;
     Simplite.dataKey = dataKey;
-    
-    
+
     /**
      * 为模板引擎注入过滤方法
      * @private
@@ -118,6 +121,7 @@
     Simplite.addFilter = function (name, fun, simplite) {
         (simplite || Simplite).filters[name] = fun;
     };
+
     /**
      * 为模板引擎注册模板
      * @private
@@ -128,6 +132,7 @@
     Simplite.addTemplate = function (name, template, simplite) {
         (simplite || Simplite).templates[name] = template;
     };
+
     /**
      * 添加处理过滤数据方法
      * @private
@@ -138,6 +143,7 @@
     Simplite.filter = function (name) {
         return this.filters[name].apply(this, slice.call(arguments, 1));
     };
+
     /**
      * 引入子模板
      * @private
@@ -148,8 +154,10 @@
     Simplite.include = function (name, data) {
         return Simplite.render(name, data, this);
     };
+
     // 分析关键词语法
     var keywordReg = /(^|[^\s])\s*(include|filter)\s*\(([^;]+)\)/g;
+    var blankReg = /\s+/g;
 
     Simplite.compile = function (name, simplite) {
         simplite = simplite || Simplite;
@@ -157,30 +165,45 @@
         if (renderer) {
             return renderer;
         }
-        var attrTagReg = new RegExp(simplite.attrOpenTag + '(.+?)' + simplite.attrCloseTag, 'g');
-        var logicOpenTagReg = new RegExp(simplite.logicOpenTag, 'g');
-        var logicCloseTagReg = new RegExp(simplite.logicCloseTag, 'g');
-        var blankReg = /\s+/g;
-        var html = simplite.templates[name].replace(blankReg, ' ').replace(attrTagReg, function (all, p) {
+        var attrTagReg = simplite.attrTagReg;
+        var logicOpenTagReg = simplite.logicOpenTagReg;
+        var logicCloseTagReg = simplite.logicCloseTagReg;
+        if (!attrTagReg) {
+            attrTagReg = simplite.attrTagReg = new RegExp(simplite.attrOpenTag + '(.+?)' + simplite.attrCloseTag, 'g');
+            logicOpenTagReg = simplite.logicOpenTagReg = new RegExp(simplite.logicOpenTag, 'g');
+            logicCloseTagReg = simplite.logicCloseTagReg = new RegExp(simplite.logicCloseTag, 'g');
+        }
+        var attrHandler = function (all, p) {
             if (p.charAt(0) === '#') {
                 return '"+this.filter("escape",' + p.substr(1) + ')+"';
             }
-            return '"+' + p+ '+"';
-        }).replace(logicCloseTagReg, 'out+="').replace(logicOpenTagReg, '";').replace(keywordReg, function (all, pre, keyword, args) {
+            return '"+(' + p+ ')+"';
+        };
+        var keywordHandler = function (all, pre, keyword, args) {
             if (pre === '.') {
                 return all;
             }
             if (args.indexOf(',') < 0) {
-                args = args + ',' + Simplite.dataKey;
+                args = args + ',' + simplite.dataKey;
             }
-            return (pre || '') + ' out+=this.' + keyword + '(' + args + ');';
-        });
-        renderer = new Function (simplite.dataKey, 'var out = "' + html + '";return out;');
-        return simplite.compiles[name] = (renderer.bind ? renderer.bind(simplite) : function () {
-            return renderer.apply(simplite, slice.call(arguments));
-        });
+            return (pre || '') + ' out+=this.' + keyword + '(' + args + ')\n';
+        };
+        var html = simplite.templates[name]
+            .replace(blankReg, ' ')
+            .replace(attrTagReg, attrHandler)
+            .replace(logicCloseTagReg, 'out+="')
+            .replace(logicOpenTagReg, '";')
+            .replace(keywordReg, keywordHandler);
+        try {
+            renderer = new Function (simplite.dataKey, 'var out = "' + html + '";return out;');
+            return simplite.compiles[name] = (hasBind ? renderer.bind(simplite) : function () {
+                return renderer.apply(simplite, slice.call(arguments));
+            });
+        } catch (e) {
+            throw e;
+        }
     };
-    
+
     /**
      * 向模板渲染成填充好数据的dom片段的字符串形式
      * @private
@@ -191,7 +214,7 @@
     Simplite.render = function (name, data, simplite) {
         return Simplite.compile(name, simplite)(data);
     };
-    
+
     /**
      * html模板编译
      * @public
@@ -207,7 +230,6 @@
      * @return {Function(Object)} 返回带数据的字符串形式的html
      */
     Simplite.prototype.render = function (name, data) {
-        this.beforerender(data);
         return Simplite.render(name, data, this);
     };
 
@@ -222,16 +244,6 @@
     };
 
     /**
-     * 使用指定name的filter对传入的数据做处理
-     * @public
-     * @param {string} name 注入的方法名称
-     * @param {*} ... 传入方法的不定长参数
-     */
-    Simplite.prototype.filter = function (name) {
-        return Simplite.filter.apply(this, arguments);
-    };
-
-    /**
      * 注册模板，主要为name和html模板建立关联，方便后续获取
      * @public
      * @param {string} name 模板的名称
@@ -239,6 +251,16 @@
      */
     Simplite.prototype.addTemplate = function (name, template) {
         Simplite.addTemplate(name, template, this);
+    };
+
+    /**
+     * 使用指定name的filter对传入的数据做处理
+     * @public
+     * @param {string} name 注入的方法名称
+     * @param {*} ... 传入方法的不定长参数
+     */
+    Simplite.prototype.filter = function (name) {
+        return Simplite.filter.apply(this, arguments);
     };
 
     /**
