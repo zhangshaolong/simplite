@@ -81,6 +81,7 @@ var testList = {list: [
             var source = document.getElementById('juicer').innerHTML;
             for (var i = 0; i < number; i ++) {
                 var compiled_tpl=juicer.compile(source, config);
+                //console.log(compiled_tpl)
             }
         },
         render: function () {
@@ -106,6 +107,7 @@ var testList = {list: [
             var source = document.getElementById('doT').innerHTML;
             for (var i = 0; i < number; i ++) {
                 var doTtmpl = doT.template(source);
+                //console.log(doTtmpl)
             }
         },
         render: function () {
@@ -121,11 +123,10 @@ var testList = {list: [
         tester: function () {
             var source = document.getElementById('simplite').innerHTML;
             Simplite.addTemplate('test', source);
-            var render = Simplite.render;
             var compile = Simplite.compile;
             for (var i = 0; i < number; i ++) {
-                compile('test');
-                render('test', data);
+                var render = compile('test');
+                render(data);
             }
         },
         comp: function () {
@@ -134,14 +135,15 @@ var testList = {list: [
             var compile = Simplite.compile;
             for (var i = 0; i < number; i ++) {
                 var render = compile('test');
+                //console.log(render)
             }
         },
         render: function () {
             var source = document.getElementById('simplite').innerHTML;
             Simplite.addTemplate('test', source);
-            var render = Simplite.render;
+            var render = Simplite.compile('test');
             for (var i = 0; i < number; i ++) {
-                render('test', data);
+                render(data);
             }
         }
     },
