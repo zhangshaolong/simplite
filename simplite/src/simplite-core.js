@@ -158,20 +158,17 @@
     // 分析关键词语法
     var keywordReg = /(^|[^\s])\s*(include|filter)\s*\(([^;]+)\)/g;
     var blankReg = /\s+/g;
+    var trimBlankReg = /^\s+|\s+$/;
 
     Simplite.compile = function (name, simplite) {
         simplite = simplite || Simplite;
-        var renderer = simplite.compiles[name];
-        if (renderer) {
-            return renderer;
-        }
         var attrTagReg = simplite.attrTagReg;
         var logicOpenTagReg = simplite.logicOpenTagReg;
         var logicCloseTagReg = simplite.logicCloseTagReg;
         if (!attrTagReg) {
             attrTagReg = simplite.attrTagReg = new RegExp(simplite.attrOpenTag + '(.+?)' + simplite.attrCloseTag, 'g');
-            logicOpenTagReg = simplite.logicOpenTagReg = new RegExp(simplite.logicOpenTag, 'g');
-            logicCloseTagReg = simplite.logicCloseTagReg = new RegExp(simplite.logicCloseTag, 'g');
+            logicOpenTagReg = simplite.logicOpenTagReg = new RegExp('\\s*' + simplite.logicOpenTag + '\\s*', 'g');
+            logicCloseTagReg = simplite.logicCloseTagReg = new RegExp('\\s*' + simplite.logicCloseTag + '\\s*', 'g');
         }
         var attrHandler = function (all, p) {
             if (p.charAt(0) === '#') {
@@ -190,15 +187,16 @@
         };
         var html = simplite.templates[name]
             .replace(blankReg, ' ')
+            .replace(trimBlankReg, '')
             .replace(attrTagReg, attrHandler)
-            .replace(logicCloseTagReg, 'out+="')
             .replace(logicOpenTagReg, '";')
+            .replace(logicCloseTagReg, ' out+="')
             .replace(keywordReg, keywordHandler);
         try {
-            renderer = new Function (simplite.dataKey, 'var out = "' + html + '";return out;');
-            return simplite.compiles[name] = (hasBind ? renderer.bind(simplite) : function () {
+            var renderer = new Function (simplite.dataKey, '"use strict";\nvar out="' + html + '";return out;');
+            return hasBind ? renderer.bind(simplite) : function () {
                 return renderer.apply(simplite, slice.call(arguments));
-            });
+            };
         } catch (e) {
             throw e;
         }
@@ -212,7 +210,12 @@
      * @return {string} 返回使用data数据填充好模板的html字符串
      */
     Simplite.render = function (name, data, simplite) {
-        return Simplite.compile(name, simplite)(data);
+        simplite = simplite || Simplite;
+        var renderer = simplite.compiles[name];
+        if (!renderer) {
+            renderer = simplite.compiles[name] = Simplite.compile(name, simplite);
+        }
+        return renderer(data);
     };
 
     /**
