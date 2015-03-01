@@ -35,7 +35,6 @@
     var attrCloseTag = '%>';
     // 默认使用_this作为传入数据的载体，可以使用_this.a获取数据中的a属性的值
     var dataKey = '_this';
-    var hasBind = typeof Function.bind === 'function';
     //默认的过滤器
     var filters = {
         escape: function () {
@@ -194,8 +193,8 @@
             .replace(keywordReg, keywordHandler);
         try {
             var renderer = new Function (simplite.dataKey, '"use strict";\nvar out="' + html + '";return out;');
-            return hasBind ? renderer.bind(simplite) : function () {
-                return renderer.apply(simplite, slice.call(arguments));
+            return function (data) {
+                return renderer.call(simplite, data);
             };
         } catch (e) {
             throw e;
