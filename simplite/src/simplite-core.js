@@ -158,6 +158,7 @@
     var keywordReg = /(^|[^\s])\s*(include|filter)\s*\(([^;]+)\)/g;
     var blankReg = /\s+/g;
     var trimBlankReg = /^\s+|\s+$/;
+    var commentReg = /(?:"([^\"]*(\.)?)*")|(?:'([^\']*(\.)?)*')|(?:\/{2,}.*?(\r|\n))|(?:\/\*(\n|.)*?\*\/)/g;
 
     Simplite.compile = function (name, simplite) {
         simplite = simplite || Simplite;
@@ -169,6 +170,9 @@
             logicOpenTagReg = simplite.logicOpenTagReg = new RegExp('\\s*' + simplite.logicOpenTag + '\\s*', 'g');
             logicCloseTagReg = simplite.logicCloseTagReg = new RegExp('\\s*' + simplite.logicCloseTag + '\\s*', 'g');
         }
+        var commentHandler = function (all) {
+            return /^\/{2,}/.test(all) || /^\/\*/.test(all) ? '' : all;  
+        };
         var attrHandler = function (all, p) {
             if (p.charAt(0) === '#') {
                 return '"+this.filter("escape",' + p.substr(1) + ')+"';
@@ -185,6 +189,7 @@
             return (pre || '') + ' out+=this.' + keyword + '(' + args + ')\n';
         };
         var html = simplite.templates[name]
+            .replace(commentReg, commentHandler)
             .replace(blankReg, ' ')
             .replace(trimBlankReg, '')
             .replace(attrTagReg, attrHandler)
