@@ -251,19 +251,19 @@ var testList = {list: [
         tester: function () {
             var source = document.getElementById('underscoreTemplate').innerHTML;
             for (var i = 0; i < number; i ++) {
-                var fn = _.template(source, null, {variable: 'list'});
+                var fn = _.template(source, null);
                 fn(data);
             }
         },
         comp: function () {
             var source = document.getElementById('underscoreTemplate').innerHTML;
             for (var i = 0; i < number; i ++) {
-                var fn = _.template(source, null, {variable: 'list'});
+                var fn = _.template(source, null);
             }
         },
         render: function () {
             var source = document.getElementById('underscoreTemplate').innerHTML;
-            var fn = _.template(source, null, {variable: 'list'});
+            var fn = _.template(source, null);
             for (var i = 0; i < number; i ++) {
                 fn(data);
             }
@@ -763,9 +763,11 @@ var startComp = function () {
 <!-- underscore 的模板 -->
 <script id="underscoreTemplate" type="text/tmpl">
 <ul>
-    <% for (var i = 0, l = list.length; i < l; i ++) { %>
-        <li><%=list[i].index%>. 用户: <%=list[i].user%>/ 网站：<%=list[i].site%></li>
-    <% } %>
+    <%_.each(list, function(item) {%>
+        <li>
+            <%-item.index%>. 用户: <%=item.user%>/ 网站：<%=item.site%>
+        </li>
+    <%});%>
 </ul>
 </script>
 </head>
@@ -790,6 +792,9 @@ var startComp = function () {
 <div id="container-test" style="min-width: 400px; margin: 0 auto"></div>
 <div id="container-render" style="min-width: 400px; margin: 0 auto"></div>
 <div id="container-comp" style="min-width: 400px; margin: 0 auto"></div>
+<div id="con-"></div>
+<div id="con-"></div>
+<div id="con-"></div>
 <div id="con-"></div>
 <div id="con-"></div>
 <div id="con-"></div>
