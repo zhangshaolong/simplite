@@ -18,11 +18,12 @@
 <script src="http://jstemplates.sinaapp.com/js/easytemplate.js"></script>
 <script src="http://jstemplates.sinaapp.com/js/underscore.js"></script>
 <script src="../src/simplite-core.js"></script>
+<script src="./etpl.js"></script>
 <script>
 // 数据量
-var length = 1000;
+var length = 100;
 // 渲染次数
-var number = 1000;
+var number = 10000;
 var data = {
     list: []
 };
@@ -142,6 +143,30 @@ var testList = {list: [
             var source = document.getElementById('simplite').innerHTML;
             Simplite.addTemplate('test', source);
             var render = Simplite.compile('test');
+            for (var i = 0; i < number; i ++) {
+                render(data);
+            }
+        }
+    },
+    {
+        name: 'etpl',
+        tester: function () {
+            var source = document.getElementById('etpl').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var render = etpl.compile(source);
+                render(data);
+            }
+        },
+        comp: function () {
+            var source = document.getElementById('etpl').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var render = etpl.compile(source);
+                //console.log(render);
+            }
+        },
+        render: function () {
+            var source = document.getElementById('etpl').innerHTML;
+            var render = etpl.compile(source);
             for (var i = 0; i < number; i ++) {
                 render(data);
             }
@@ -685,6 +710,15 @@ var startComp = function () {
         <% val = _this.list[i]; %>
         <li><%=val.index%>. 用户: <%=val.user%>/ 网站：<%=val.site%></li>
     <% } %>
+</ul>
+</script>
+
+<!-- etpl 的模板 -->
+<script id="etpl" type="text/tmpl">
+<ul>
+<!-- for: ${list} as ${person}, ${index} -->
+    <li>${index}. 用户${person.user}/ 网站：${person.site}</li>
+<!-- /for -->
 </ul>
 </script>
 
