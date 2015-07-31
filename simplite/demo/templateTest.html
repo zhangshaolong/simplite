@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>动态引入模板文件</title>
+</head>
+<body>
+<div id="div"></div>
+<script src="./require.js"></script>
+<script>
+    requirejs.config({
+        baseUrl: '../src/',
+        paths: {
+            text: '../demo/require-text',
+            simplite: 'simplite-core'
+        }
+    });
+
+    requirejs(['template-loader'], function (templateLoader) {
+        templateLoader('../demo/templates.tpl', function (s, t) {
+            var html = s.render('table-tpl', {
+                name: 'test',
+                gender: '男',
+                age: 12,
+                c: {
+                    name: '小比',
+                    gender: '《<div>双性人</div>',
+                    age: 27
+                }
+            });
+            console.log(t);
+            document.getElementById('div').innerHTML = html;
+        });
+    });
+</script>
+</body>
+</html>

@@ -18,12 +18,12 @@
 <script src="http://jstemplates.sinaapp.com/js/easytemplate.js"></script>
 <script src="http://jstemplates.sinaapp.com/js/underscore.js"></script>
 <script src="../src/simplite-core.js"></script>
-<script src="./etpl.js"></script>
+<script src="http://ecomfe.github.io/etpl/js/etpl.js"></script>
 <script>
 // 数据量
-var length = 100;
+var length = 10000;
 // 渲染次数
-var number = 10000;
+var number = 100;
 var data = {
     list: []
 };
@@ -804,5 +804,40 @@ var startComp = function () {
 <div id="con-"></div>
 <div id="con-"></div>
 <div id="con-"></div>
+
+
+
+<script>
+    
+    var d1 = new Date().getTime();
+    var source = document.getElementById('simplite').innerHTML;
+    Simplite.addTemplate('test', source);
+    var render = Simplite.compile('test');
+    for (var i = 0; i < number; i ++) {
+        render(data);
+    }
+
+
+    var d2 = new Date().getTime();
+    var source = document.getElementById('etpl').innerHTML;
+    var render = etpl.compile(source);
+    for (var i = 0; i < number; i ++) {
+        render(data);
+    }
+
+    var d3 = new Date().getTime();
+    template.isEscape = false;
+    var source = document.getElementById('template').innerHTML;
+    var fn = template.compile(source);
+    for (var i = 0; i < number; i ++) {
+        fn(data);
+    }
+
+    var d4 = new Date().getTime();
+
+    console.log(d4 - d3, d3 - d2, d2 - d1);
+
+
+</script>
 </body>
 </html>
