@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>动态引入模板文件</title>
+</head>
+<body>
+<div id="div"></div>
+<script src="./require.js" data-main="loadTemplate"></script>
+<script>
+    requirejs.config({
+        baseUrl: '../src/',
+        paths: {
+            text: '../demo/require-text',
+            loadTemplate: '../demo/loadTemplate',
+            simplite: 'simplite-core'
+        }
+    });
+</script>
+</body>
+</html>

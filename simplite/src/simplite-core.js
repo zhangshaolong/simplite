@@ -171,7 +171,7 @@
             logicCloseTagReg = simplite.logicCloseTagReg = new RegExp('\\s*' + simplite.logicCloseTag + '\\s*', 'g');
         }
         var commentHandler = function (all) {
-            return /^\/{2,}/.test(all) || /^\/\*/.test(all) ? '' : all;  
+            return /^\/{2,}/.test(all) || /^\/\*/.test(all) ? '' : all;
         };
         var attrHandler = function (all, p) {
             if (p.charAt(0) === '#') {
