@@ -190,13 +190,14 @@
             }
             return (pre || '') + ' out+=this.' + keyword + '(' + args + ')\n';
         };
+        var quotHandler = function (all) {
+            return all.replace(/"/g, '\\"');
+        };
         var html = simplite.templates[name]
             .replace(commentReg, commentHandler)
             .replace(blankReg, ' ')
             .replace(trimBlankReg, '')
-            .replace(htmlReg, function (all) {
-                return all.replace(/"/g, '\\"');
-            })
+            .replace(htmlReg, quotHandler)
             .replace(attrTagReg, attrHandler)
             .replace(logicOpenTagReg, '";')
             .replace(logicCloseTagReg, ' out+="')
