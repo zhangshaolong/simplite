@@ -158,17 +158,19 @@
     var keywordReg = /(^|[^\s])\s*(include|filter)\s*\(([^;]+)\)/g;
     var blankReg = /\s+/g;
     var trimBlankReg = /^\s+|\s+$/;
-    var commentReg = /(?:"([^\"]*(\.)?)*")|(?:'([^\']*(\.)?)*')|(?:\/{2,}.*?(\r|\n))|(?:\/\*(\n|.)*?\*\/)/g;
+    var commentReg = /(?:"([^\"]*)*")|(?:'([^\']*)*')|(?:\/{2,}.*?(\r|\n))|(?:\/\*(\n|.)*?\*\/)/g;
 
     Simplite.compile = function (name, simplite) {
         simplite = simplite || Simplite;
         var attrTagReg = simplite.attrTagReg;
         var logicOpenTagReg = simplite.logicOpenTagReg;
         var logicCloseTagReg = simplite.logicCloseTagReg;
+        var htmlReg = simplite.htmlReg;
         if (!attrTagReg) {
             attrTagReg = simplite.attrTagReg = new RegExp(simplite.attrOpenTag + '(.+?)' + simplite.attrCloseTag, 'g');
             logicOpenTagReg = simplite.logicOpenTagReg = new RegExp('\\s*' + simplite.logicOpenTag + '\\s*', 'g');
             logicCloseTagReg = simplite.logicCloseTagReg = new RegExp('\\s*' + simplite.logicCloseTag + '\\s*', 'g');
+            htmlReg = simplite.htmlReg = new RegExp('(?:' + simplite.logicCloseTag  + '|^)(?:.+?)' + simplite.logicOpenTag, 'g');
         }
         var commentHandler = function (all) {
             return /^\/{2,}/.test(all) || /^\/\*/.test(all) ? '' : all;
@@ -192,6 +194,9 @@
             .replace(commentReg, commentHandler)
             .replace(blankReg, ' ')
             .replace(trimBlankReg, '')
+            .replace(htmlReg, function (all) {
+                return all.replace(/"/g, '\\"');
+            })
             .replace(attrTagReg, attrHandler)
             .replace(logicOpenTagReg, '";')
             .replace(logicCloseTagReg, ' out+="')

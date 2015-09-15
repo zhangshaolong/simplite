@@ -1,6 +1,6 @@
 {{ -- tpl:table-tpl -- }}
 <table>
-    <head>
+    <head class="aaa">
         <tr>
             <th>姓名</th>
             <th>性别</th>
@@ -18,9 +18,14 @@
 {{ -- /tpl -- }}
 
 {{ -- tpl:juhuixue-index-tpl -- }}
+<div>aa</div>
+<%
+    var a = "aaaa";
+%>
 <div>
     <div><%=_this.name%></div>
     <div><%=#_this.gender%></div>
     <div><%=_this.age%></div>
+    <div><%=a%></div>
 </div>
 {{ -- /tpl -- }}
