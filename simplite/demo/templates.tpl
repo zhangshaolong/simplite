@@ -15,6 +15,7 @@
         </tr>
     </body>
 </table>
+<% include('test-tpl') %>
 {{ -- /tpl -- }}
 
 {{ -- tpl:juhuixue-index-tpl -- }}
@@ -28,4 +29,9 @@
     <div><%=_this.age%></div>
     <div><%=a%></div>
 </div>
+{{ -- /tpl -- }}
+
+{{ -- tpl:test-tpl -- }}
+<div class="aaaa">test-tpl</div>
+
 {{ -- /tpl -- }}
