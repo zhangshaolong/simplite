@@ -170,7 +170,7 @@
             attrTagReg = simplite.attrTagReg = new RegExp(simplite.attrOpenTag + '(.+?)' + simplite.attrCloseTag, 'g');
             logicOpenTagReg = simplite.logicOpenTagReg = new RegExp('\\s*' + simplite.logicOpenTag + '\\s*', 'g');
             logicCloseTagReg = simplite.logicCloseTagReg = new RegExp('\\s*' + simplite.logicCloseTag + '\\s*', 'g');
-            htmlReg = simplite.htmlReg = new RegExp('(?:(?:' + simplite.logicCloseTag  + '|^)(?:.+?)' + simplite.logicOpenTag + ')|(?:^(?:.+?)$)', 'g');
+            htmlReg = simplite.htmlReg = new RegExp('(?:(?:' + simplite.logicCloseTag  + '|^)(?:.+?)(?:$|' + simplite.logicOpenTag + '))|(?:^(?:.+?)$)', 'g');
         }
         var commentHandler = function (all) {
             return /^\/{2,}/.test(all) || /^\/\*/.test(all) ? '' : all;
