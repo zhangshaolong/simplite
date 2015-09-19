@@ -168,8 +168,8 @@
         var htmlReg = simplite.htmlReg;
         if (!attrTagReg) {
             attrTagReg = simplite.attrTagReg = new RegExp(simplite.attrOpenTag + '(.+?)' + simplite.attrCloseTag, 'g');
-            logicOpenTagReg = simplite.logicOpenTagReg = new RegExp('\\s*' + simplite.logicOpenTag + '\\s*', 'g');
-            logicCloseTagReg = simplite.logicCloseTagReg = new RegExp('\\s*' + simplite.logicCloseTag + '\\s*', 'g');
+            logicOpenTagReg = simplite.logicOpenTagReg = new RegExp('(?=\\s?)' + simplite.logicOpenTag + '\\s?', 'g');
+            logicCloseTagReg = simplite.logicCloseTagReg = new RegExp('\\s?' + simplite.logicCloseTag + '(?=\\s?)', 'g');
             htmlReg = simplite.htmlReg = new RegExp('(?:' + simplite.logicCloseTag  + '|^).+?(?:$|' + simplite.logicOpenTag + ')', 'g');
         }
         var commentHandler = function (all) {
@@ -179,7 +179,7 @@
             if (p.charAt(0) === '#') {
                 return '"+this.filter("escape",' + p.substr(1) + ')+"';
             }
-            return '"+(' + p+ ')+"';
+            return '"+(' + p + ')+"';
         };
         var keywordHandler = function (all, pre, keyword, args) {
             if (pre === '.') {
@@ -190,18 +190,20 @@
             }
             return (pre || '') + ' out+=this.' + keyword + '(' + args + ')\n';
         };
-        var quotHandler = function (all) {
-            return all.replace(/"/g, '\\"');
+        var quotReg = /"/g;
+        var htmlHandler = function (all) {
+            return all.replace('> <', '><').replace(quotReg, '\\"');
         };
         var html = simplite.templates[name]
             .replace(commentReg, commentHandler)
             .replace(blankReg, ' ')
             .replace(trimBlankReg, '')
-            .replace(htmlReg, quotHandler)
+            .replace(htmlReg, htmlHandler)
             .replace(attrTagReg, attrHandler)
             .replace(logicOpenTagReg, '";')
             .replace(logicCloseTagReg, ' out+="')
-            .replace(keywordReg, keywordHandler);
+            .replace(keywordReg, keywordHandler)
+            .replace('out+="";', '');
         try {
             var renderer = new Function (simplite.dataKey, '"use strict";\nvar out="' + html + '";return out;');
             return function (data) {
