@@ -159,6 +159,7 @@
     var blankReg = /\s+/g;
     var trimBlankReg = /^\s+|\s+$/;
     var commentReg = /(?:"([^\"]*)*")|(?:'([^\']*)*')|(?:\/{2,}.*?(\r|\n))|(?:\/\*(\n|.)*?\*\/)/g;
+    var emptyOutReg = /\s_o\+=\"\";?/g;
 
     Simplite.compile = function (name, simplite) {
         simplite = simplite || Simplite;
@@ -170,7 +171,7 @@
             attrTagReg = simplite.attrTagReg = new RegExp(simplite.attrOpenTag + '(.+?)' + simplite.attrCloseTag, 'g');
             logicOpenTagReg = simplite.logicOpenTagReg = new RegExp('(?=\\s?)' + simplite.logicOpenTag + '\\s?', 'g');
             logicCloseTagReg = simplite.logicCloseTagReg = new RegExp('\\s?' + simplite.logicCloseTag + '(?=\\s?)', 'g');
-            htmlReg = simplite.htmlReg = new RegExp('(?:' + simplite.logicCloseTag  + '|^)(?:(?!' + simplite.logicOpenTag + ')(?!' + simplite.logicCloseTag + ').)+?(?:$|' + simplite.logicOpenTag + ')', 'g');
+            htmlReg = simplite.htmlReg = new RegExp('(?:' + simplite.logicCloseTag  + '|^)(?:(?!' + simplite.logicOpenTag + ').)+?(?:$|' + simplite.logicOpenTag + ')', 'g');
         }
         var commentHandler = function (all) {
             return /^\/{2,}/.test(all) || /^\/\*/.test(all) ? '' : all;
@@ -188,7 +189,7 @@
             if (args.indexOf(',') < 0) {
                 args = args + ',' + simplite.dataKey;
             }
-            return (pre || '') + ' out+=this.' + keyword + '(' + args + ')\n';
+            return (pre || '') + ' _o+=this.' + keyword + '(' + args + ')\n';
         };
         var quotReg = /"/g;
         var htmlHandler = function (all) {
@@ -201,11 +202,11 @@
             .replace(htmlReg, htmlHandler)
             .replace(attrTagReg, attrHandler)
             .replace(logicOpenTagReg, '";')
-            .replace(logicCloseTagReg, ' out+="')
+            .replace(logicCloseTagReg, ' _o+="')
             .replace(keywordReg, keywordHandler)
-            .replace('out+="";', '');
+            .replace(emptyOutReg, ' ');
         try {
-            var renderer = new Function (simplite.dataKey, '"use strict";\nvar out="' + html + '";return out;');
+            var renderer = new Function (simplite.dataKey, '"use strict";\nvar _o="' + html + '";return _o;');
             return function (data) {
                 return renderer.call(simplite, data);
             };
