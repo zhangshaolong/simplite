@@ -2,7 +2,7 @@
 <table>
     <head class="aaa">
         <tr>
-            <th>姓名</th>
+            <th class="<%=/**alert(1212);*/_this.name%> <%=_this.gender%>">/**sdfs*/姓名</th>
             <th>性别</th>
             <th>年龄</th>
         </tr>
@@ -33,5 +33,17 @@
 
 {{ -- tpl:test-tpl -- }}
 <div class="aaaa">test-tpl</div>
+<%
+    include('test');
+%>
 
 {{ -- /tpl -- }}
+
+{{ --tpl: test -- }}
+<%
+    var aaa = 'sd"as""f"';
+
+    //alert(aaa);
+
+%>
+{{ --/tpl--}}

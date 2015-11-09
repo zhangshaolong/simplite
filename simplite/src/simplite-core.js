@@ -157,7 +157,7 @@
     // 分析关键词语法
     var keywordReg = /(^|[^\s])\s*(include|filter)\s*\(([^;]+)\)/g;
     var quotReg = /"/g;
-    var commentAndTagBlankTrimReg = /(?:(["']).*\1)|(?:\/\/.*?\n)|(?:\/\*([\s\S])*?\*\/)|(?:\>\s+\<)|(?:\s+)/g;
+    var commentAndTagBlankTrimReg = /(?:(["']).*?\1)|(?:\/\/.*?\n)|(?:\/\*([\s\S])*?\*\/)|(?:\>\s+\<)|(?:\s+)/g;
     var emptyOutReg = /\s_o\+=\"\";?/g;
 
     Simplite.compile = function (name, simplite) {
