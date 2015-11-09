@@ -156,9 +156,8 @@
 
     // 分析关键词语法
     var keywordReg = /(^|[^\s])\s*(include|filter)\s*\(([^;]+)\)/g;
-    var blankReg = /\s+/g;
-    var trimBlankReg = /^\s+|\s+$/;
-    var commentReg = /(?:"([^\"]*)*")|(?:'([^\']*)*')|(?:\/{2,}.*?(\r|\n))|(?:\/\*(\n|.)*?\*\/)/g;
+    var quotReg = /"/g;
+    var commonAndTagBlankTrimReg = /(?:"([^\"]*)*")|(?:'([^\']*)*')|(?:\/{2,}.*?(\r|\n))|(?:\/\*(\n|.)*?\*\/)|(?:\>\s+\<)|(?:\s+)/g;
     var emptyOutReg = /\s_o\+=\"\";?/g;
 
     Simplite.compile = function (name, simplite) {
@@ -173,9 +172,22 @@
             logicCloseTagReg = simplite.logicCloseTagReg = new RegExp('\\s?' + simplite.logicCloseTag + '(?=\\s?)', 'g');
             htmlReg = simplite.htmlReg = new RegExp('(?:' + simplite.logicCloseTag  + '|^)(?:(?!' + simplite.logicOpenTag + ').)+?(?:$|' + simplite.logicOpenTag + ')', 'g');
         }
-        var commentHandler = function (all) {
-            return /^\/{2,}/.test(all) || /^\/\*/.test(all) ? '' : all;
-        };
+        var commonAndTagBlankTrimHandler = function () {
+            return function (all) {
+                var start = all.charAt(0);
+                switch (start) {
+                    case '/' :
+                        return '';
+                    case '"' :
+                        return all;
+                    case '\'' :
+                        return all;
+                    case '>' :
+                        return '><';
+                }
+                return ' ';
+            }
+        }();
         var attrHandler = function (all, p) {
             if (p.charAt(0) === '#') {
                 return '"+this.filter("escape",' + p.substr(1) + ')+"';
@@ -191,20 +203,17 @@
             }
             return (pre || '') + ' _o+=this.' + keyword + '(' + args + ')\n';
         };
-        var quotReg = /"/g;
         var htmlHandler = function (all) {
-            return all.replace('> <', '><').replace(quotReg, '\\"');
+            return all.replace(quotReg, '\\"');
         };
         var html = simplite.templates[name]
-            .replace(commentReg, commentHandler)
-            .replace(blankReg, ' ')
-            .replace(trimBlankReg, '')
+            .replace(commonAndTagBlankTrimReg, commonAndTagBlankTrimHandler)
             .replace(htmlReg, htmlHandler)
             .replace(attrTagReg, attrHandler)
             .replace(logicOpenTagReg, '";')
             .replace(logicCloseTagReg, ' _o+="')
             .replace(keywordReg, keywordHandler)
-            .replace(emptyOutReg, ' ');
+            .replace(emptyOutReg, '');
         try {
             var renderer = new Function (simplite.dataKey, '"use strict";\nvar _o="' + html + '";return _o;');
             return function (data) {
