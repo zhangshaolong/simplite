@@ -158,7 +158,7 @@
     var keywordReg = /(^|[^\s])\s*(include|filter)\s*\(([^;]+)\)/g;
     var quotReg = /"/g;
     var commentAndTagBlankTrimReg = /(?:(["'])[\s\S]*?\1)|(?:\/\/.*?\n)|(?:\/\*([\s\S])*?\*\/)|(?:\>\s+\<)|(?:\s+)/g;
-    var emptyOutReg = /\s_o\+=\"\";?/g;
+    var emptyOutReg = /\s_o\+=\"\";/g;
 
     Simplite.compile = function (name, simplite) {
         simplite = simplite || Simplite;
