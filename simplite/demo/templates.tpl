@@ -2,7 +2,7 @@
 <table>
     <head class="aaa">
         <tr>
-            <th class="<%=/**alert(1212);*/_this.name%> <%=_this.gender%> <% 
+            <th class="<%=/**alert(1212);*/_this.name%>        <%=_this.gender%> <% 
 
             if (true) {%>aaa<%}%>">/**sdfs*/姓名</th>
             <th>性别</th>
@@ -12,7 +12,7 @@
     <body>
         <tr>
             <td>
-                <%=_this.name%>
+                <%= _this.name%>      a<%=_this.name%>
             </td>
             <td><%=_this.gender%></td>
             <td><%=_this.age%><% include('juhuixue-index-tpl', _this.c); %></td>
