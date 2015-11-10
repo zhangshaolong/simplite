@@ -189,7 +189,7 @@
         };
         var attrHandler = function (all, p) {
             if (p.charAt(0) === '#') {
-                return '"+_t.filter("escape",' + p.slice(1) + ')+"';
+                return '"+_t.filter("escape",' + p.slice(1).replace(filterReg, '_t.filter(') + ')+"';
             }
             return '"+(' + p.replace(filterReg, '_t.filter(') + ')+"';
         };

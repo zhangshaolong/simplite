@@ -5,7 +5,7 @@ define(function (require) {
     templateLoader('../demo/templates.tpl', function (simplite, templateMap) {
 
         simplite.addFilter('abc', function (name) {
-            return 'sddsdsds';
+            return '<div style="background: red;">ttest filter</div>';
         });
         var html = simplite.render('table-tpl', {
             name: 'test',
