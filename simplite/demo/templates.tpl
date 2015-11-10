@@ -2,7 +2,9 @@
 <table>
     <head class="aaa">
         <tr>
-            <th class="<%=/**alert(1212);*/_this.name%> <%=_this.gender%>">/**sdfs*/姓名</th>
+            <th class="<%=/**alert(1212);*/_this.name%> <%=_this.gender%> <% 
+
+            if (true) {%>aaa<%}%>">/**sdfs*/姓名</th>
             <th>性别</th>
             <th>年龄</th>
         </tr>
