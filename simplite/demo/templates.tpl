@@ -12,7 +12,7 @@
     <body>
         <tr>
             <td>
-                <%= _this.name%>      a<%=_this.name%>
+                <%= _this.name%>      a<%=_this.name%><%= filter('abc', _this.name)%>
             </td>
             <td><%=_this.gender%></td>
             <td><%=_this.age%><% include('juhuixue-index-tpl', _this.c); %></td>

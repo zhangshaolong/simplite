@@ -3,6 +3,10 @@ define(function (require) {
     var templateLoader = require('template-loader');
 
     templateLoader('../demo/templates.tpl', function (simplite, templateMap) {
+
+        simplite.addFilter('abc', function (name) {
+            return 'sddsdsds';
+        });
         var html = simplite.render('table-tpl', {
             name: 'test',
             gender: '男',
