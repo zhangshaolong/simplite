@@ -11,17 +11,7 @@
     } else if (typeof require === 'undefined') {
         root.Simplite = simplite;
     } else { // node端接口
-        root.logicOpenTag = simplite.logicOpenTag;
-        root.logicCloseTag = simplite.logicCloseTag;
-        root.attrOpenTag = simplite.attrOpenTag;
-        root.attrCloseTag = simplite.attrCloseTag;
-        root.dataKey = simplite.dataKey;
-        root.addFilter = simplite.addFilter;
-        root.addTemplate = simplite.addTemplate;
-        root.include = simplite.include;
-        root.filter = simplite.filter;
-        root.compile = simplite.compile;
-        root.render = simplite.render;
+        module.exports = simplite;
     }
 })(this, function () {
     'use strict'
