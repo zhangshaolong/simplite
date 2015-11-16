@@ -144,8 +144,8 @@
         return Simplite.render(name, data, this);
     };
 
-    // 分析include关键词语法
-    var includeReg = /(^|[^\s])\s*include\s*\(([^;]+)\)/g;
+    // 分析关键词语法
+    var keywordReg = /(^|[^\s])\s*(include|filter)\s*\(([^;]+)\)/g;
     // 分析filter关键词语法
     var filterReg = /^\s*filter\(/g;
     var quotReg = /"/g;
@@ -183,14 +183,14 @@
             }
             return '"+(' + p.replace(filterReg, '_t.filter(') + ')+"';
         };
-        var includeHandler = function (all, pre, args) {
+        var keywordHandler = function (all, pre, keyword, args) {
             if (pre === '.') {
                 return all;
             }
             if (args.indexOf(',') < 0) {
                 args = args + ',' + simplite.dataKey;
             }
-            return (pre || '') + ' _o+=_t.include(' + args + ');';
+            return (pre || '') + ' _o+=_t.' + keyword + '(' + args + ')\n';
         };
         var htmlHandler = function (all) {
             return all.replace(quotReg, '\\"');
@@ -201,7 +201,7 @@
             .replace(attrTagReg, attrHandler)
             .replace(logicOpenTagReg, '";')
             .replace(logicCloseTagReg, ' _o+="')
-            .replace(includeReg, includeHandler);
+            .replace(keywordReg, keywordHandler);
         try {
             var renderer = new Function (simplite.dataKey, '"use strict";\nvar _t=this,_o="' + html + '";return _o;');
             return function (data) {
