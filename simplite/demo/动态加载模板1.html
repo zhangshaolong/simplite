@@ -18,6 +18,9 @@
 
     requirejs(['template-loader'], function (templateLoader) {
         templateLoader('../demo/templates.tpl', function (s, t) {
+            s.addFilter('abc', function (name) {
+                return '<div style="background: red;">ttest filter</div>';
+            });
             var html = s.render('table-tpl', {
                 name: 'test',
                 gender: '男',

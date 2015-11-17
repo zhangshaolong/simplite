@@ -3,7 +3,6 @@ define(function (require) {
     var templateLoader = require('template-loader');
 
     templateLoader('../demo/templates.tpl', function (simplite, templateMap) {
-
         simplite.addFilter('abc', function (name) {
             return '<div style="background: red;">ttest filter</div>';
         });

@@ -15,47 +15,6 @@
     }
 })(this, function () {
     'use strict'
-    // 默认逻辑开始标签
-    var logicOpenTag = '<%';
-    // 默认逻辑闭合标签
-    var logicCloseTag = '%>';
-    // 默认属性开始标签
-    var attrOpenTag = '<%=';
-    // 默认属性闭合标签
-    var attrCloseTag = '%>';
-    // 默认使用_this作为传入数据的载体，可以使用_this.a获取数据中的a属性的值
-    var dataKey = '_this';
-    //默认的过滤器
-    var filters = {
-        escape: function () {
-            // 转义对应表
-            var htmlMeta = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                '\'': '&#39;',
-                '\\': '\\\\'
-            };
-            var escapeReg = /\\|&|<|>|"|'/g;
-            /**
-             * 对html元素进行转义
-             * @private param {string} txt html字符串
-             * @return {string} 返回转义好的html字符串
-             */
-            return function (txt) {
-                if (typeof txt === 'undefined') {
-                    return '';
-                }
-                if (typeof txt !== 'string') {
-                    return txt;
-                }
-                return txt.replace(escapeReg, function (ch) {
-                    return htmlMeta[ch];
-                });
-            };
-        }()
-    };
 
     var slice = Array.prototype.slice;
 
@@ -68,37 +27,67 @@
         return to;
     };
 
+    var getConfig = function (options) {
+        options = options || {};
+        return {
+            // 默认逻辑开始标签
+            logicOpenTag: options.logicOpenTag || '<%',
+            // 默认逻辑闭合标签
+            logicCloseTag: options.logicCloseTag || '%>',
+            // 默认属性开始标签
+            attrOpenTag: options.attrOpenTag || '<%=',
+            // 默认属性闭合标签
+            attrCloseTag: options.attrCloseTag || '%>',
+            // 默认使用_this作为传入数据的载体，可以使用_this.a获取数据中的a属性的值
+            dataKey: options.dataKey || '_this',
+            // 初始化已编译存储容器
+            compiles: {},
+            // 初始化已加载模板存储容器
+            templates: {},
+            //默认的过滤器
+            filters: options.filters || {
+                escape: function () {
+                    // 转义对应表
+                    var htmlMeta = {
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        '"': '&quot;',
+                        '\'': '&#39;',
+                        '\\': '\\\\'
+                    };
+                    var escapeReg = /\\|&|<|>|"|'/g;
+                    /**
+                     * 对html元素进行转义
+                     * @private param {string} txt html字符串
+                     * @return {string} 返回转义好的html字符串
+                     */
+                    return function (txt) {
+                        if (typeof txt === 'undefined') {
+                            return '';
+                        }
+                        if (typeof txt !== 'string') {
+                            return txt;
+                        }
+                        return txt.replace(escapeReg, function (ch) {
+                            return htmlMeta[ch];
+                        });
+                    };
+                }()
+            }
+        };
+    };
+
     /**
      * 模板对象构造器，可以使用new初始化模板对象，也可以使用静态函数方式 完成模板相关功能调用
      * @constructor
      * @param {Object} options 初始化配置参数
-     * @param {string|Dom|Jquery} option.target 模板填充到的指定元素， 支持domId，dom元素和jquery包装的dom元素方式
-     * @param {string|Dom|Jquery} option.template 模板元素或模板内容
      */
     var Simplite = function (options) {
-        options = options || {};
-        this.filters = mixin(filters, options.filters || {});
-        this.templates = options.templates || {};
-        this.logicOpenTag = options.logicOpenTag || logicOpenTag;
-        this.logicCloseTag = options.logicCloseTag || logicCloseTag;
-        this.attrOpenTag = options.attrOpenTag || attrOpenTag;
-        this.attrCloseTag = options.attrCloseTag || attrCloseTag;
-        this.dataKey = options.dataKey || dataKey;
-        this.compiles = {};
+        mixin(getConfig(options), this);
     };
 
-    // 编译过的模板的集合
-    Simplite.compiles = {};
-    // 注入的过滤器集合
-    Simplite.filters = filters;
-    // 注入的模板集合
-    Simplite.templates = {};
-
-    Simplite.logicOpenTag = logicOpenTag;
-    Simplite.logicCloseTag = logicCloseTag;
-    Simplite.attrOpenTag = attrOpenTag;
-    Simplite.attrCloseTag = attrCloseTag;
-    Simplite.dataKey = dataKey;
+    mixin(getConfig(), Simplite);
 
     /**
      * 为模板引擎注入过滤方法

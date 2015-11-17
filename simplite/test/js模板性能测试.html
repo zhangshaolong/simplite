@@ -640,8 +640,10 @@ var startComp = function () {
 <!-- artTemplate 的模板 -->
 <script id="template" type="text/tmpl">
 <ul>
-<% for (i = 0, l = list.length; i < l; i ++) { %>
-<li><%=list[i].index%>. 用户: <%=list[i].user%>/ 网站：<%=list[i].site%></li>
+<% for (i = 0, l = list.length; i < l; i ++) { 
+    var val = list[i];
+%>
+<li><%=val.index%>. 用户: <%=val.user%>/ 网站：<%=val.site%></li>
 <% } %>
 </ul>
 </script>
@@ -697,8 +699,8 @@ var startComp = function () {
 <script id="doT" type="text/tmpl">
 <ul>
     {{ for (var val, i = 0, l = it.list.length; i < l; i ++) { }}
-        {{ val = it.list; }}
-        <li>{{=val[i].index}}. 用户: {{=val[i].user}}/ 网站：{{=val[i].site}}</li>
+        {{ val = it.list[i]; }}
+        <li>{{=val.index}}. 用户: {{=val.user}}/ 网站：{{=val.site}}</li>
     {{ } }}
 </ul>
 </script>
