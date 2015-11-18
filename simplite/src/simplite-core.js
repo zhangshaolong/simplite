@@ -91,7 +91,6 @@
 
     /**
      * 为模板引擎注入过滤方法
-     * @private
      * @param {string} name 注入的方法名称
      * @param {Function} fun 注入的方法
      * @param {Simplite?} simplite 当前的Simplite实例
@@ -102,9 +101,8 @@
 
     /**
      * 为模板引擎注册模板
-     * @private
-     * @param {string} name 注入的方法名称
-     * @param {Function} fun 注入的方法
+     * @param {string} name 注入的模板名称
+     * @param {string} template 模板内容字符串
      * @param {Simplite?} simplite 当前的Simplite实例
      */
     Simplite.addTemplate = function (name, template, simplite) {
@@ -113,7 +111,6 @@
 
     /**
      * 添加处理过滤数据方法
-     * @private
      * @param {string} name 需要调用的方法名称
      * @param {*} ... 传入方法的不定长参数
      * @return {string} 返回过滤之后的结果
@@ -124,9 +121,8 @@
 
     /**
      * 引入子模板
-     * @private
-     * @param {string|Dom|Jquery} template 模板元素或者模板html
-     * @param {Object} data 用来填充模板的数据
+     * @param {string} name 子模板名称
+     * @param {*?} data 用来填充模板的数据
      * @return {string} 返回使用data数据填充好模板的html字符串
      */
     Simplite.include = function (name, data) {
@@ -203,9 +199,8 @@
 
     /**
      * 向模板渲染成填充好数据的dom片段的字符串形式
-     * @private
-     * @param {string} template 模板html
-     * @param {Object} data 用来填充模板的数据
+     * @param {string} name 模板名称
+     * @param {*?} data 用来填充模板的数据
      * @return {string} 返回使用data数据填充好模板的html字符串
      */
     Simplite.render = function (name, data, simplite) {
@@ -219,7 +214,7 @@
 
     /**
      * html模板编译
-     * @public
+     * @param {string} name 模板名称
      * @return {Function(Object)} 返回根据html模板编译好的处理函数
      */
     Simplite.prototype.compile = function (name) {
@@ -228,7 +223,8 @@
 
     /**
      * 使用data的数据渲染指定name的模板
-     * @public
+     * @param {string} name 模板名称
+     * @param {*?} data 用来填充模板的数据
      * @return {Function(Object)} 返回带数据的字符串形式的html
      */
     Simplite.prototype.render = function (name, data) {
@@ -237,7 +233,6 @@
 
     /**
      * 注入名字为name的filter
-     * @public
      * @param {string} name 注入的方法名称
      * @param {Function} fun 注入的方法
      */
@@ -247,7 +242,6 @@
 
     /**
      * 注册模板，主要为name和html模板建立关联，方便后续获取
-     * @public
      * @param {string} name 模板的名称
      * @param {string} template 模板
      */
@@ -257,7 +251,6 @@
 
     /**
      * 使用指定name的filter对传入的数据做处理
-     * @public
      * @param {string} name 注入的方法名称
      * @param {*} ... 传入方法的不定长参数
      */
@@ -267,9 +260,8 @@
 
     /**
      * 根据name导入模板
-     * @public
      * @param {string} name 注入的方法名称
-     * @param {*} data 给模板传入的数据集
+     * @param {*?} data 给模板传入的数据集
      */
     Simplite.prototype.include = function (name, data) {
         return Simplite.include.apply(this, arguments);
