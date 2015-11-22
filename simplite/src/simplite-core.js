@@ -134,6 +134,7 @@
     // 分析filter关键词语法
     var filterReg = /^\s*filter\(/g;
     var quotReg = /"/g;
+    var endTokenReg = /\n/g;
     var commentAndTagBlankTrimReg = /(?:(["'])[\s\S]*?\1)|(?:\/\/.*\n)|(?:\/\*([\s\S])*?\*\/)|(?:\>\s+\<)|(?:\s+)/g;
 
     Simplite.compile = function (name, simplite) {
@@ -155,7 +156,7 @@
                     return '';
                 case '"' :
                 case "'" :
-                    return all;
+                    return all.replace(endTokenReg, '\\n');
                 case '>' :
                     return '><';
                 default :
