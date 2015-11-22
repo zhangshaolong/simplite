@@ -185,10 +185,10 @@
             .replace(htmlReg, htmlHandler)
             .replace(attrTagReg, attrHandler)
             .replace(logicOpenTagReg, '";')
-            .replace(logicCloseTagReg, ' _o+="')
+            .replace(logicCloseTagReg, '\n_o+="')
             .replace(keywordReg, keywordHandler);
         try {
-            var renderer = new Function (simplite.dataKey, '"use strict";\nvar _t=this,_o="' + html + '";return _o;');
+            var renderer = new Function (simplite.dataKey, '"use strict"\nvar _t=this,_o="' + html + '";return _o;');
             return function (data) {
                 return renderer.call(simplite, data);
             };
