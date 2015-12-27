@@ -137,6 +137,30 @@
     var endTokenReg = /\n/g;
     var commentAndTagBlankTrimReg = /(?:(["'])[\s\S]*?\1)|(?:\/\/.*\n)|(?:\/\*([\s\S])*?\*\/)|(?:\>\s+\<)|(?:\s+)/g;
 
+    var commentAndTagBlankTrimHandler = function (all) {
+        var start = all.charAt(0);
+        switch (start) {
+            case '/' :
+                return '';
+            case '"' :
+            case "'" :
+                return all.replace(endTokenReg, '\\n');
+            case '>' :
+                return '><';
+            default :
+                return ' ';
+        }
+    };
+    var attrHandler = function (all, p) {
+        if (p.charAt(0) === '#') {
+            return '"+_t.filter("escape",' + p.slice(1).replace(filterReg, '_t.filter(') + ')+"';
+        }
+        return '"+(' + p.replace(filterReg, '_t.filter(') + ')+"';
+    };
+    var htmlHandler = function (all) {
+        return all.replace(quotReg, '\\"');
+    };
+
     Simplite.compile = function (name, simplite) {
         simplite = simplite || Simplite;
         var attrTagReg = simplite.attrTagReg;
@@ -149,47 +173,8 @@
             logicCloseTagReg = simplite.logicCloseTagReg = new RegExp('\\s?' + simplite.logicCloseTag + '(?=\\s?)', 'g');
             htmlReg = simplite.htmlReg = new RegExp('(?:' + simplite.logicCloseTag  + '|^)(?:(?!' + simplite.logicOpenTag + ')[\\s\\S])+?(?:$|' + simplite.logicOpenTag + ')', 'g');
         }
-        var commentAndTagBlankTrimHandler = function (all) {
-            var start = all.charAt(0);
-            switch (start) {
-                case '/' :
-                    return '';
-                case '"' :
-                case "'" :
-                    return all.replace(endTokenReg, '\\n');
-                case '>' :
-                    return '><';
-                default :
-                    return ' ';
-            }
-        };
-        var attrHandler = function (all, p) {
-            if (p.charAt(0) === '#') {
-                return '"+_t.filter("escape",' + p.slice(1).replace(filterReg, '_t.filter(') + ')+"';
-            }
-            return '"+(' + p.replace(filterReg, '_t.filter(') + ')+"';
-        };
-        var keywordHandler = function (all, pre, keyword, args) {
-            if (pre === '.') {
-                return all;
-            }
-            if (args.indexOf(',') < 0) {
-                args = args + ',' + simplite.dataKey;
-            }
-            return (pre || '') + ' _o+=_t.' + keyword + '(' + args + ')\n';
-        };
-        var htmlHandler = function (all) {
-            return all.replace(quotReg, '\\"');
-        };
-        var html = simplite.templates[name]
-            .replace(commentAndTagBlankTrimReg, commentAndTagBlankTrimHandler)
-            .replace(htmlReg, htmlHandler)
-            .replace(attrTagReg, attrHandler)
-            .replace(logicOpenTagReg, '";')
-            .replace(logicCloseTagReg, '\n_o+="')
-            .replace(keywordReg, keywordHandler);
         try {
-            var renderer = new Function (simplite.dataKey, '"use strict"\nvar _t=this,_o="' + html + '";return _o;');
+            var renderer = new Function (simplite.dataKey, simplite.toCodeBlock(simplite.templates[name], simplite));
             return function (data) {
                 return renderer.call(simplite, data);
             };
@@ -211,6 +196,26 @@
             renderer = simplite.compiles[name] = Simplite.compile(name, simplite);
         }
         return renderer(data);
+    };
+
+    Simplite.toCodeBlock = function (template, simplite) {
+        var keywordHandler = function (all, pre, keyword, args) {
+            if (pre === '.') {
+                return all;
+            }
+            if (args.indexOf(',') < 0) {
+                args = args + ',' + simplite.dataKey;
+            }
+            return (pre || '') + ' _o+=_t.' + keyword + '(' + args + ')\n';
+        };
+        simplite = simplite || Simplite;
+        var codeBlock = template.replace(commentAndTagBlankTrimReg, commentAndTagBlankTrimHandler)
+        .replace(simplite.htmlReg, htmlHandler)
+        .replace(simplite.attrTagReg, attrHandler)
+        .replace(simplite.logicOpenTagReg, '";')
+        .replace(simplite.logicCloseTagReg, '\n_o+="')
+        .replace(keywordReg, keywordHandler);
+        return '"use strict"\nvar _t=this,_o="' + codeBlock + '";return _o;';
     };
 
     /**
