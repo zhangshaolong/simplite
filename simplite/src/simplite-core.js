@@ -144,7 +144,7 @@
                 return '';
             case '"' :
             case "'" :
-                return all.replace(endTokenReg, '\\n');
+                return all;
             case '>' :
                 return '><';
             default :
@@ -153,9 +153,9 @@
     };
     var attrHandler = function (all, p) {
         if (p.charAt(0) === '#') {
-            return '"+_t.filter("escape",' + p.slice(1).replace(filterReg, '_t.filter(') + ')+"';
+            return '"+_t.defaultAttr(_t.filter("escape",' + p.slice(1).replace(filterReg, '_t.filter(') + '))+"';
         }
-        return '"+(' + p.replace(filterReg, '_t.filter(') + ')+"';
+        return '"+_t.defaultAttr(' + p.replace(filterReg, '_t.filter(') + ')+"';
     };
     var htmlHandler = function (all) {
         return all.replace(quotReg, '\\"');
@@ -198,6 +198,12 @@
         return renderer(data);
     };
 
+    /**
+     * 把字符串模板编译成代码语句字符串
+     * @param {string} template 模板内容
+     * @param {Simplite} simplite Simplite对象，默认为Simplite类
+     * @return {string} 返回函数体的字符串形式
+     */
     Simplite.toCodeBlock = function (template, simplite) {
         var keywordHandler = function (all, pre, keyword, args) {
             if (pre === '.') {
@@ -216,6 +222,15 @@
         .replace(simplite.logicCloseTagReg, '\n_o+="')
         .replace(keywordReg, keywordHandler);
         return '"use strict"\nvar _t=this,_o="' + codeBlock + '";return _o;';
+    };
+
+    /**
+     * 输出的属性值的默认值
+     * @param {string} val 原始的属性值
+     * @return {string} 当原始值不存在时的默认值
+     */
+    Simplite.defaultAttr = function (val) {
+        return val || '';
     };
 
     /**
@@ -271,6 +286,15 @@
      */
     Simplite.prototype.include = function (name, data) {
         return Simplite.include.apply(this, arguments);
+    };
+
+    /**
+     * 输出的属性值的默认值
+     * @param {string} val 原始的属性值
+     * @return {string} 当原始值不存在时的默认值
+     */
+    Simplite.prototype.defaultAttr = function (val) {
+        return Simplite.defaultAttr(val);
     };
 
     return Simplite;
