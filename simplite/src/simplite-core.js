@@ -100,6 +100,16 @@
     };
 
     /**
+     * 获取名字为name的filter
+     * @param {string} name 注入的方法名称
+     * @param {Simplite?} simplite 当前的Simplite实例
+     * @return {Function} fun 注入的方法
+     */
+    Simplite.getFilter = function (name, simplite) {
+        return (simplite || Simplite).filters[name];
+    };
+
+    /**
      * 为模板引擎注册模板
      * @param {string} name 注入的模板名称
      * @param {string} template 模板内容字符串
@@ -259,6 +269,15 @@
      */
     Simplite.prototype.addFilter = function (name, fun) {
         Simplite.addFilter(name, fun, this);
+    };
+
+    /**
+     * 获取名字为name的filter
+     * @param {string} name 注入的方法名称
+     * @return {Function} fun 注入的方法
+     */
+    Simplite.prototype.getFilter = function (name) {
+        return Simplite.getFilter(name, this);
     };
 
     /**
