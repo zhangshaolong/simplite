@@ -240,7 +240,7 @@
      * @return {string} 当原始值不存在时的默认值
      */
     Simplite.defaultAttr = function (val) {
-        return val || '';
+        return val == null ? '' : val;
     };
 
     /**
