@@ -23,7 +23,7 @@
 {{ -- /tpl -- }}
 
 {{ -- tpl:juhuixue-index-tpl -- }}
-<div>aa</div>
+<div>aa!!<%= _this.name %></div>
 <%
     var a = "aaaa";
 %>
@@ -33,6 +33,7 @@
     <div><%=_this.age%></div>
     <div><%=a%></div>
 </div>
+其他子name：<% include('test-tpl') %>
 {{ -- /tpl -- }}
 
 {{ -- tpl:test-tpl -- }}
@@ -44,6 +45,7 @@
 {{ -- /tpl -- }}
 
 {{ --tpl: test -- }}
+测试多层传递：<%= _this.name %>ss
 <%
     var aaa = 'sd"as""f"';
 

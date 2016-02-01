@@ -136,6 +136,30 @@
      * @return {string} 返回使用data数据填充好模板的html字符串
      */
     Simplite.include = function (name, data) {
+        var len = arguments.length;
+        if (len > 2) {
+            var _this = arguments[len - 1];
+            data = {};
+            for (var i = 1; i < len - 1; i++) {
+                var arg = arguments[i];
+                if (arg != null) {
+                    if (arg.constructor === Object) {
+                        for (var key in arg) {
+                            data[key] = arg[key];
+                        }
+                    } else {
+                        data = arg;
+                    }
+                }
+            }
+            if (data.constructor === Object && _this != null && _this.constructor === Object) {
+                for (var key in _this) {
+                    if (!data.hasOwnProperty(key)) {
+                        data[key] = _this[key];
+                    }
+                }
+            }
+        }
         return Simplite.render(name, data, this);
     };
 
@@ -219,10 +243,7 @@
             if (pre === '.') {
                 return all;
             }
-            if (args.indexOf(',') < 0) {
-                args = args + ',' + simplite.dataKey;
-            }
-            return (pre || '') + ' _o+=_t.' + keyword + '(' + args + ')\n';
+            return (pre || '') + ' _o+=_t.' + keyword + '(' + args + ',' + simplite.dataKey + ')\n';
         };
         simplite = simplite || Simplite;
         var codeBlock = template.replace(commentAndTagBlankTrimReg, commentAndTagBlankTrimHandler)
