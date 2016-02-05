@@ -192,7 +192,7 @@
         return '"+_t.defaultAttr(' + p.replace(filterReg, '_t.filter(') + ')+"';
     };
     var htmlHandler = function (all) {
-        return all.replace(quotReg, '\\"');
+        return all.replace(quotReg, '\\"').replace(endTokenReg, '\\n');
     };
 
     Simplite.compile = function (name, simplite) {
