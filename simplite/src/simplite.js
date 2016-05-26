@@ -213,6 +213,7 @@
                 return renderer.call(simplite, data);
             };
         } catch (e) {
+            console && console.log && console.log(name, e);
             throw e;
         }
     };
