@@ -213,7 +213,7 @@
                 return renderer.call(simplite, data);
             };
         } catch (e) {
-            console && console.log && console.log(name, e);
+            console && console.log && console.log(name, e.stack || e);
             throw e;
         }
     };
@@ -247,8 +247,8 @@
             return (pre || '') + ' _o+=_t.' + keyword + '(' + args + ',' + simplite.dataKey + ')\n';
         };
         simplite = simplite || Simplite;
-        var codeBlock = template.replace(commentAndTagBlankTrimReg, commentAndTagBlankTrimHandler)
-        .replace(simplite.htmlReg, htmlHandler)
+        var codeBlock = template.replace(simplite.htmlReg, htmlHandler)
+        .replace(commentAndTagBlankTrimReg, commentAndTagBlankTrimHandler)
         .replace(simplite.attrTagReg, attrHandler)
         .replace(simplite.logicOpenTagReg, '";')
         .replace(simplite.logicCloseTagReg, '\n_o+="')
