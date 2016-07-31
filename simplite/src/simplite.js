@@ -168,7 +168,7 @@
     // 分析filter关键词语法
     var filterReg = /^\s*filter\(/g;
     var quotReg = /"/g;
-    var endTokenReg = /\n/g;
+    var slashReg = /\//g;
     var commentAndTagBlankTrimReg = /(?:(["'])[\s\S]*?\1)|(?:\/\/.*\n)|(?:\/\*([\s\S])*?\*\/)|(?:\>\s+\<)|(?:\s+)/g;
 
     var commentAndTagBlankTrimHandler = function (all) {
@@ -192,7 +192,7 @@
         return '"+_t.defaultAttr(' + p.replace(filterReg, '_t.filter(') + ')+"';
     };
     var htmlHandler = function (all) {
-        return all.replace(quotReg, '\\"').replace(endTokenReg, '\\n');
+        return all.replace(slashReg, '\\/').replace(quotReg, '\\"');
     };
 
     Simplite.compile = function (name, simplite) {
