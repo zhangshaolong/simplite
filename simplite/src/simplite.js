@@ -197,16 +197,6 @@
 
     Simplite.compile = function (name, simplite) {
         simplite = simplite || Simplite;
-        var attrTagReg = simplite.attrTagReg;
-        var logicOpenTagReg = simplite.logicOpenTagReg;
-        var logicCloseTagReg = simplite.logicCloseTagReg;
-        var htmlReg = simplite.htmlReg;
-        if (!attrTagReg) {
-            attrTagReg = simplite.attrTagReg = new RegExp(simplite.attrOpenTag + '([\\s\\S]+?)' + simplite.attrCloseTag, 'g');
-            logicOpenTagReg = simplite.logicOpenTagReg = new RegExp('(?=\\s?)' + simplite.logicOpenTag + '\\s?', 'g');
-            logicCloseTagReg = simplite.logicCloseTagReg = new RegExp('\\s?' + simplite.logicCloseTag + '(?=\\s?)', 'g');
-            htmlReg = simplite.htmlReg = new RegExp('(?:' + simplite.logicCloseTag  + '|^)(?:(?!' + simplite.logicOpenTag + ')[\\s\\S])+?(?:$|' + simplite.logicOpenTag + ')', 'g');
-        }
         try {
             var renderer = new Function (simplite.dataKey, simplite.toCodeBlock(simplite.templates[name], simplite));
             return function (data) {
@@ -247,11 +237,21 @@
             return (pre || '') + ' _o+=_t.' + keyword + '(' + args + ',' + simplite.dataKey + ')\n';
         };
         simplite = simplite || Simplite;
-        var codeBlock = template.replace(simplite.htmlReg, htmlHandler)
+        var attrTagReg = simplite.attrTagReg;
+        var logicOpenTagReg = simplite.logicOpenTagReg;
+        var logicCloseTagReg = simplite.logicCloseTagReg;
+        var htmlReg = simplite.htmlReg;
+        if (!attrTagReg) {
+            attrTagReg = simplite.attrTagReg = new RegExp(simplite.attrOpenTag + '([\\s\\S]+?)' + simplite.attrCloseTag, 'g');
+            logicOpenTagReg = simplite.logicOpenTagReg = new RegExp('(?=\\s?)' + simplite.logicOpenTag + '\\s?', 'g');
+            logicCloseTagReg = simplite.logicCloseTagReg = new RegExp('\\s?' + simplite.logicCloseTag + '(?=\\s?)', 'g');
+            htmlReg = simplite.htmlReg = new RegExp('(?:' + simplite.logicCloseTag  + '|^)(?:(?!' + simplite.logicOpenTag + ')[\\s\\S])+?(?:$|' + simplite.logicOpenTag + ')', 'g');
+        }
+        var codeBlock = template.replace(htmlReg, htmlHandler)
         .replace(commentAndTagBlankTrimReg, commentAndTagBlankTrimHandler)
-        .replace(simplite.attrTagReg, attrHandler)
-        .replace(simplite.logicOpenTagReg, '";')
-        .replace(simplite.logicCloseTagReg, '\n_o+="')
+        .replace(attrTagReg, attrHandler)
+        .replace(logicOpenTagReg, '";')
+        .replace(logicCloseTagReg, '\n_o+="')
         .replace(keywordReg, keywordHandler);
         return '"use strict"\nvar _t=this,_o="' + codeBlock + '";return _o;';
     };
