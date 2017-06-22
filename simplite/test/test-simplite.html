@@ -1,0 +1,130 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>template test</title>
+<script src="../src/simplite.js"></script>
+<script src="../src/simplite1.js"></script>
+<script>
+// 数据量
+var length = 10000;
+// 渲染次数
+var number = 100;
+var data = {
+    list: []
+};
+for (var i = 0; i < length; i ++) {
+    data.list.push({
+        index: i,
+        user: '<strong style="color:red">糖饼</strong>',
+        site: 'http://www.planeart.cn',
+        weibo: 'http://weibo.com/planeart',
+        QQweibo: 'http://t.qq.com/tangbin'
+    });
+};
+</script>
+
+<!-- simplite 的模板 -->
+<script id="simplite" type="text/tmpl">
+<ul>
+    <% for (var val, i = 0, l = _this.list.length; i < l; i ++) { %>
+        <% val = _this.list[i]; %>
+        <li><%=val.index%>. 用户: <%=val.user%>/ 网站：<%=val.site%></li>
+    <% } %>
+</ul>
+</script>
+
+<!-- simplite 的模板 -->
+<script id="simplite1" type="text/tmpl">
+<ul>
+    <% for (var val, i = 0, l = _this.list.length; i < l; i ++) { %>
+        <% val = _this.list[i]; %>
+        <li>{{val.index}}. 用户: {{val.user}}/ 网站：{{val.site}}</li>
+    <% } %>
+</ul>
+</script>
+<script>
+var test = {
+    name: 'simplite',
+    tester: function () {
+        var source = document.getElementById('simplite').innerHTML;
+        Simplite.addTemplate('test', source);
+        var compile = Simplite.compile;
+        for (var i = 0; i < number; i ++) {
+            var render = compile('test');
+            render(data);
+        }
+    },
+    comp: function () {
+        var source = document.getElementById('simplite').innerHTML;
+        Simplite.addTemplate('test', source);
+        var compile = Simplite.compile;
+        for (var i = 0; i < number; i ++) {
+            var render = compile('test');
+            //console.log(render)
+        }
+    },
+    render: function () {
+        var source = document.getElementById('simplite').innerHTML;
+        Simplite.addTemplate('test', source);
+        var render = Simplite.compile('test');
+        for (var i = 0; i < number; i ++) {
+            render(data);
+        }
+    }
+};
+
+var test1 = {
+    name: 'simplite1',
+    tester: function () {
+        var source = document.getElementById('simplite1').innerHTML;
+        Simplite1.addTemplate('test', source);
+        var compile = Simplite1.compile;
+        for (var i = 0; i < number; i ++) {
+            var render = compile('test');
+            render(data);
+        }
+    },
+    comp: function () {
+        var source = document.getElementById('simplite1').innerHTML;
+        Simplite1.addTemplate('test', source);
+        var compile = Simplite1.compile;
+        for (var i = 0; i < number; i ++) {
+            var render = compile('test');
+            //console.log(render)
+        }
+    },
+    render: function () {
+        var source = document.getElementById('simplite1').innerHTML;
+        Simplite1.addTemplate('test', source);
+        var render = Simplite1.compile('test');
+        for (var i = 0; i < number; i ++) {
+            render(data);
+        }
+    }
+};
+
+var d = new Date().getTime();
+test.tester();
+var d1 = new Date().getTime();
+test.comp();
+var d2 = new Date().getTime();
+test.render();
+var d3 = new Date().getTime();
+
+
+var d4 = new Date().getTime();
+test1.tester();
+var d5 = new Date().getTime();
+test1.comp();
+var d6 = new Date().getTime();
+test1.render();
+var d7 = new Date().getTime();
+console.log(d7 - d6, d6 - d5, d5 - d4);
+console.log(d3 - d2, d2 - d1, d1 - d);
+
+</script>
+</head>
+<body>
+</body>
+</html>

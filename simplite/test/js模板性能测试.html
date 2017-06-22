@@ -3,22 +3,18 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>template test</title>
-<script src="http://jstemplates.sinaapp.com/js/jquery-1.7.2.min.js"></script>
-<script src="http://jstemplates.sinaapp.com/js/highcharts.js"></script>
-<script src="http://jstemplates.sinaapp.com/js/tmpl.js"></script>
-<script src="http://jstemplates.sinaapp.com/js/doT.js"></script>
-<script src="http://jstemplates.sinaapp.com/js/juicer.js"></script>
-<script src="http://jstemplates.sinaapp.com/js/kissy.js"></script>
-<script src="http://jstemplates.sinaapp.com/js/kissy-template.js"></script>
-<script src="http://jstemplates.sinaapp.com/js/template.js"></script>
-<script src="http://jstemplates.sinaapp.com/js/mustache.js"></script>
-<script src="http://jstemplates.sinaapp.com/js/handlebars.js"></script>
-<script src="http://jstemplates.sinaapp.com/js/baiduTemplate.js"></script>
-<script src="http://jstemplates.sinaapp.com/js/jquery.tmpl.js"></script>
-<script src="http://jstemplates.sinaapp.com/js/easytemplate.js"></script>
-<script src="http://jstemplates.sinaapp.com/js/underscore.js"></script>
+<script src="https://www.highcharts.com/lib/jquery-3.1.1.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+<script src="doT.min.js"></script>
+<script src="juicer.js"></script>
+<script src="handlebars-v4.0.5.js"></script>
+<script src="baiduTemplate.js"></script>
+<script src="jquery.tmpl.js"></script>
+<script src="http://underscorejs.org/underscore.js"></script>
 <script src="../src/simplite.js"></script>
-<script src="http://ecomfe.github.io/etpl/js/etpl.js"></script>
+<script src="etpl.js"></script>
+<script src="artTemplate.min.js"></script>
 <script>
 // 数据量
 var length = 10000;
@@ -40,32 +36,32 @@ for (var i = 0; i < length; i ++) {
 
 // 待测试的引擎列表
 var testList = {list: [
-    {
-        name: 'artTemplate',
-        tester: function () {
-            template.isEscape = false;
-            var source = document.getElementById('template').innerHTML;
-            for (var i = 0; i < number; i ++) {
-                var fn = template.compile(source);
-                fn(data);
-            }
-        },
-        comp: function () {
-            template.isEscape = false;
-            var source = document.getElementById('template').innerHTML;
-            for (var i = 0; i < number; i ++) {
-                var fn = template.compile(source);
-            }
-        },
-        render: function () {
-            template.isEscape = false;
-            var source = document.getElementById('template').innerHTML;
-            var fn = template.compile(source);
-            for (var i = 0; i < number; i ++) {
-                fn(data);
-            }
-        }
-    },
+    // {
+    //     name: 'artTemplate',
+    //     tester: function () {
+    //         template.isEscape = false;
+    //         var source = document.getElementById('template').innerHTML;
+    //         for (var i = 0; i < number; i ++) {
+    //             var fn = template.compile(source);
+    //             fn(data);
+    //         }
+    //     },
+    //     comp: function () {
+    //         template.isEscape = false;
+    //         var source = document.getElementById('template').innerHTML;
+    //         for (var i = 0; i < number; i ++) {
+    //             var fn = template.compile(source);
+    //         }
+    //     },
+    //     render: function () {
+    //         template.isEscape = false;
+    //         var source = document.getElementById('template').innerHTML;
+    //         var fn = template.compile(source);
+    //         for (var i = 0; i < number; i ++) {
+    //             fn(data);
+    //         }
+    //     }
+    // },
     {
         name: 'juicer',
         tester: function () {
@@ -196,56 +192,56 @@ var testList = {list: [
             }
         }
     },
-    {
-        name: 'tmpl',
-        tester: function () {
-            var source = document.getElementById('tmpl').innerHTML;
-            for (var i = 0; i < number; i ++) {
-                var fn = tmpl(source);
-                fn(data);
-            }
-        },
-        comp: function () {
-            var source = document.getElementById('tmpl').innerHTML;
-            for (var i = 0; i < number; i ++) {
-                var fn = tmpl(source);
-            }
-        },
-        render: function () {
-            var source = document.getElementById('tmpl').innerHTML;
-            var fn = tmpl(source);
-            for (var i = 0; i < number; i ++) {
-                fn(data);
-            }
-        }
-    },
-    {
-        name: 'easyTemplate',
-        tester: function () {
-            var source = document.getElementById('easyTemplate').innerHTML;
-            for (var i = 0; i < number; i ++) {
-                var fn = easyTemplate(source);
-                // easyTemplate 渲染方法被重写到 toString(), 需要取值操作才会运行
-                fn(data) + '';
-            }
-        },
-        comp: function () {
-            var source = document.getElementById('easyTemplate').innerHTML;
-            for (var i = 0; i < number; i ++) {
-                var fn = easyTemplate(source);
-                // easyTemplate 渲染方法被重写到 toString(), 需要取值操作才会运行
-                // fn(data) + '';
-            }
-        },
-        render: function () {
-            var source = document.getElementById('easyTemplate').innerHTML;
-            var fn = easyTemplate(source);
-            for (var i = 0; i < number; i ++) {
-                // easyTemplate 渲染方法被重写到 toString(), 需要取值操作才会运行
-                fn(data) + '';
-            }
-        }
-    },
+    // {
+    //     name: 'tmpl',
+    //     tester: function () {
+    //         var source = document.getElementById('tmpl').innerHTML;
+    //         for (var i = 0; i < number; i ++) {
+    //             var fn = tmpl(source);
+    //             fn(data);
+    //         }
+    //     },
+    //     comp: function () {
+    //         var source = document.getElementById('tmpl').innerHTML;
+    //         for (var i = 0; i < number; i ++) {
+    //             var fn = tmpl(source);
+    //         }
+    //     },
+    //     render: function () {
+    //         var source = document.getElementById('tmpl').innerHTML;
+    //         var fn = tmpl(source);
+    //         for (var i = 0; i < number; i ++) {
+    //             fn(data);
+    //         }
+    //     }
+    // },
+    // {
+    //     name: 'easyTemplate',
+    //     tester: function () {
+    //         var source = document.getElementById('easyTemplate').innerHTML;
+    //         for (var i = 0; i < number; i ++) {
+    //             var fn = easyTemplate(source);
+    //             // easyTemplate 渲染方法被重写到 toString(), 需要取值操作才会运行
+    //             fn(data) + '';
+    //         }
+    //     },
+    //     comp: function () {
+    //         var source = document.getElementById('easyTemplate').innerHTML;
+    //         for (var i = 0; i < number; i ++) {
+    //             var fn = easyTemplate(source);
+    //             // easyTemplate 渲染方法被重写到 toString(), 需要取值操作才会运行
+    //             // fn(data) + '';
+    //         }
+    //     },
+    //     render: function () {
+    //         var source = document.getElementById('easyTemplate').innerHTML;
+    //         var fn = easyTemplate(source);
+    //         for (var i = 0; i < number; i ++) {
+    //             // easyTemplate 渲染方法被重写到 toString(), 需要取值操作才会运行
+    //             fn(data) + '';
+    //         }
+    //     }
+    // },
     {
         name: 'underscoreTemplate',
         tester: function () {
@@ -308,57 +304,57 @@ $.tmpl(source, data);
 }
 }
 },*/
-    {
-        name: 'Mustache',
-        tester: function () {
-            var source = document.getElementById('Mustache').innerHTML;
-            for (var i = 0; i < number; i ++) {
-                var compiledTemplate = Mustache.compile(source);
-                var templateOutput = compiledTemplate(data);
-                // Mustache.to_html(source, data);
-            }
-        },
-        comp: function () {
-            var source = document.getElementById('Mustache').innerHTML;
-            for (var i = 0; i < number; i ++) {
-                var compiledTemplate = Mustache.compile(source);
-                // Mustache.to_html(source, data);
-            }
-        },
-        render: function () {
-            var source = document.getElementById('Mustache').innerHTML;
-            var compiledTemplate = Mustache.compile(source);
-            for (var i = 0; i < number; i ++) {
-                var templateOutput = compiledTemplate(data);
-            }
-        }
-    }
+    // {
+    //     name: 'Mustache',
+    //     tester: function () {
+    //         var source = document.getElementById('Mustache').innerHTML;
+    //         for (var i = 0; i < number; i ++) {
+    //             var compiledTemplate = Mustache.compile(source);
+    //             var templateOutput = compiledTemplate(data);
+    //             // Mustache.to_html(source, data);
+    //         }
+    //     },
+    //     comp: function () {
+    //         var source = document.getElementById('Mustache').innerHTML;
+    //         for (var i = 0; i < number; i ++) {
+    //             var compiledTemplate = Mustache.compile(source);
+    //             // Mustache.to_html(source, data);
+    //         }
+    //     },
+    //     render: function () {
+    //         var source = document.getElementById('Mustache').innerHTML;
+    //         var compiledTemplate = Mustache.compile(source);
+    //         for (var i = 0; i < number; i ++) {
+    //             var templateOutput = compiledTemplate(data);
+    //         }
+    //     }
+    // }
 ]};
-KISSY.use('template', function(S,T) {
-    testList.list.push({
-        name: 'kissyTemplate',
-        tester: function () {
-            var source= document.getElementById('kissy').innerHTML;
-            for (var i = 0; i < number; i ++) {
-                var temp = T(source);
-                temp.render(data);
-            }
-        },
-        comp: function () {
-            var source= document.getElementById('kissy').innerHTML;
-            for (var i = 0; i < number; i ++) {
-                var temp = T(source);
-            }
-        },
-        render: function () {
-            var source= document.getElementById('kissy').innerHTML;
-            var temp = T(source);
-            for (var i = 0; i < number; i ++) {
-                temp.render(data);
-            }
-        }
-    });
-});
+// KISSY.use('template', function(S,T) {
+//     testList.list.push({
+//         name: 'kissyTemplate',
+//         tester: function () {
+//             var source= document.getElementById('kissy').innerHTML;
+//             for (var i = 0; i < number; i ++) {
+//                 var temp = T(source);
+//                 temp.render(data);
+//             }
+//         },
+//         comp: function () {
+//             var source= document.getElementById('kissy').innerHTML;
+//             for (var i = 0; i < number; i ++) {
+//                 var temp = T(source);
+//             }
+//         },
+//         render: function () {
+//             var source= document.getElementById('kissy').innerHTML;
+//             var temp = T(source);
+//             for (var i = 0; i < number; i ++) {
+//                 temp.render(data);
+//             }
+//         }
+//     });
+// });
 var startComp = function () {
     var Timer = function (){
         this.startTime = + new Date;
@@ -640,7 +636,7 @@ var startComp = function () {
 <!-- artTemplate 的模板 -->
 <script id="template" type="text/tmpl">
 <ul>
-<% for (i = 0, l = list.length; i < l; i ++) { 
+<% for (i = 0, l = list.length; i < l; i ++) {
     var val = list[i];
 %>
 <li><%=val.index%>. 用户: <%=val.user%>/ 网站：<%=val.site%></li>
@@ -710,7 +706,7 @@ var startComp = function () {
 <ul>
     <% for (var val, i = 0, l = _this.list.length; i < l; i ++) { %>
         <% val = _this.list[i]; %>
-        <li><%=val.index%>. 用户: <%=val.user%>/ 网站：<%=val.site%></li>
+        <li>{{ val.index }}. 用户: {{ val.user }}/ 网站：{{ val.site }}</li>
     <% } %>
 </ul>
 </script>
@@ -810,34 +806,34 @@ var startComp = function () {
 
 
 <script>
-    
-    var d1 = new Date().getTime();
-    var source = document.getElementById('simplite').innerHTML;
-    Simplite.addTemplate('test', source);
-    var render = Simplite.compile('test');
-    for (var i = 0; i < number; i ++) {
-        render(data);
-    }
+
+    // var d1 = new Date().getTime();
+    // var source = document.getElementById('simplite').innerHTML;
+    // Simplite.addTemplate('test', source);
+    // var render = Simplite.compile('test');
+    // for (var i = 0; i < number; i ++) {
+    //     render(data);
+    // }
 
 
-    var d2 = new Date().getTime();
-    var source = document.getElementById('etpl').innerHTML;
-    var render = etpl.compile(source);
-    for (var i = 0; i < number; i ++) {
-        render(data);
-    }
+    // var d2 = new Date().getTime();
+    // var source = document.getElementById('etpl').innerHTML;
+    // var render = etpl.compile(source);
+    // for (var i = 0; i < number; i ++) {
+    //     render(data);
+    // }
 
-    var d3 = new Date().getTime();
-    template.isEscape = false;
-    var source = document.getElementById('template').innerHTML;
-    var fn = template.compile(source);
-    for (var i = 0; i < number; i ++) {
-        fn(data);
-    }
+    // var d3 = new Date().getTime();
+    // // template.isEscape = false;
+    // // var source = document.getElementById('template').innerHTML;
+    // // var fn = template.compile(source);
+    // // for (var i = 0; i < number; i ++) {
+    // //     fn(data);
+    // // }
 
-    var d4 = new Date().getTime();
+    // // var d4 = new Date().getTime();
 
-    console.log(d4 - d3, d3 - d2, d2 - d1);
+    // console.log(d3 - d2, d2 - d1);
 
 
 </script>
