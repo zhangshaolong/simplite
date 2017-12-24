@@ -63,17 +63,17 @@
                             case 34:
                                 char = '&quot;';
                                 break;
-                            case 38:
-                                char = '&amp;';
-                                break;
-                            case 39:
-                                char = '&#39;';
-                                break;
                             case 60:
                                 char = '&lt;';
                                 break;
                             case 62:
                                 char = '&gt;';
+                                break;
+                            case 38:
+                                char = '&amp;';
+                                break;
+                            case 39:
+                                char = '&#39;';
                                 break;
                             default:
                                 continue;
@@ -244,11 +244,7 @@
      */
     Simplite.render = (name, data, simplite) => {
         simplite = simplite || Simplite;
-        let renderer = simplite.compiles[name];
-        if (!renderer) {
-        renderer = simplite.compiles[name] = Simplite.compile(name);
-        }
-        return renderer(data);
+        return simplite.compiles[name](data);
     };
 
     /**
