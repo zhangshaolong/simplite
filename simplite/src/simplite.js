@@ -46,34 +46,50 @@
             templates: {},
             //默认的过滤器
             filters: options.filters || {
-                escape: function () {
-                    // 转义对应表
-                    var htmlMeta = {
-                        '&': '&amp;',
-                        '<': '&lt;',
-                        '>': '&gt;',
-                        '"': '&quot;',
-                        '\'': '&#39;',
-                        '\\': '\\\\'
-                    };
-                    var escapeReg = /\\|&|<|>|"|'/g;
-                    /**
-                     * 对html元素进行转义
-                     * @private param {string} txt html字符串
-                     * @return {string} 返回转义好的html字符串
-                     */
-                    return function (txt) {
-                        if (typeof txt === 'undefined') {
-                            return '';
+                escape: function (txt) {
+                    if (typeof txt === 'undefined') {
+                        return '';
+                    }
+                    if (typeof txt !== 'string') {
+                        return txt;
+                    }
+                    let result = '';
+                    let i = 0;
+                    let index;
+                    let char;
+                    const len = txt.length
+                    for (index = 0; i < len; ++i) {
+                        switch (txt.charCodeAt(i)) {
+                            case 34:
+                                char = '&quot;';
+                                break;
+                            case 60:
+                                char = '&lt;';
+                                break;
+                            case 62:
+                                char = '&gt;';
+                                break;
+                            case 38:
+                                char = '&amp;';
+                                break;
+                            case 39:
+                                char = '&#39;';
+                                break;
+                            default:
+                                continue;
                         }
-                        if (typeof txt !== 'string') {
-                            return txt;
+                        if (index !== i) {
+                            result += txt.substring(index, i);
                         }
-                        return txt.replace(escapeReg, function (ch) {
-                            return htmlMeta[ch];
-                        });
-                    };
-                }()
+                        index = i + 1;
+                        result += char;
+                    }
+                    if (index !== i) {
+                        return result + txt.substring(index, i);
+                    } else {
+                        return result;
+                    }
+                }
             }
         };
     };
@@ -207,7 +223,7 @@
         simplite = simplite || Simplite;
         try {
             var renderer = Function (simplite.dataKey, simplite.toCodeBlock(simplite.templates[name], simplite));
-            return function (data) {
+            return simplite.compiles[name] = function (data) {
                 return renderer.call(simplite, data);
             };
         } catch (e) {
@@ -224,11 +240,7 @@
      */
     Simplite.render = function (name, data, simplite) {
         simplite = simplite || Simplite;
-        var renderer = simplite.compiles[name];
-        if (!renderer) {
-            renderer = simplite.compiles[name] = Simplite.compile(name, simplite);
-        }
-        return renderer(data);
+        return simplite.compiles[name](data);
     };
 
     /**

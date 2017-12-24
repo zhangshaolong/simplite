@@ -227,7 +227,7 @@
         simplite = simplite || Simplite;
         try {
             const renderer = Function (simplite.dataKey, simplite.toCodeBlock(simplite.templates[name], simplite));
-            return (data) => {
+            return simplite.compiles[name] = (data) => {
                 return renderer.call(simplite, data);
             };
         } catch (e) {

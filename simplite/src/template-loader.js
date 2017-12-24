@@ -3,14 +3,9 @@
  * @author：张少龙（zhangshaolongjj@163.com）
  */
 define(function (require) {
-    var Simplite = require('simplite');
+    var simplite = require('simplite');
     var tplReg = /\{\{\s*\-\-\s*tpl\s*\:\s*([^\}\s]+)\s*\-\-\s*\}\}\s*([\s\S]*?)\{\{\s*\-\-\s*\/tpl\s*\-\-\s*\}\}/g;
-    return function (path, simplite, callback) {
-        if (!(simplite instanceof Simplite)) {
-            callback = simplite;
-            simplite = Simplite;
-        }
-
+    return function (path, callback) {
         requirejs(['text!' + path], function (text) {
             var templateMap = {};
             text.replace(tplReg, function (all, tplId, tplContent) {
