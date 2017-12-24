@@ -4,15 +4,15 @@ define(function (require) {
 
     templateLoader('../demo/templates.tpl', function (simplite, templateMap) {
         simplite.addFilter('abc', function (name) {
-            return '<div style="background: red;">ttest filter</div>';
+            return '<div style="background: red;">ttest filter被转义的html元素</div>';
         });
         var html = simplite.render('table-tpl', {
-            name: 'test',
+            name: '外层数据name',
             gender: '男',
             age: 12,
             c: {
-                name: '小比',
-                gender: '《<div>双性人</div>',
+                name: '内层数据name',
+                gender: '《<div style="color: red;">带颜色的div内的内容</div>',
                 age: 27
             }
         });

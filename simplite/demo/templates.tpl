@@ -29,7 +29,7 @@
 %>
 <div>
     <div>{{_this.name}}</div>
-    <div>{{#_this.gender}}</div>
+    <div>{{_this.gender}}</div>
     <div>{{_this.age}}</div>
     <div>{{a}}</div>
 </div>
