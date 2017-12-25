@@ -29,6 +29,52 @@
 
     const getConfig = (options) => {
         options = options || {};
+        const filters = mixin(options.filters || {}, {
+            escape: (txt) => {
+                if (typeof txt === 'undefined') {
+                    return '';
+                }
+                if (typeof txt !== 'string') {
+                    return txt;
+                }
+                let result = '';
+                let i = 0;
+                let index;
+                let char;
+                const len = txt.length
+                for (index = 0; i < len; ++i) {
+                    switch (txt.charCodeAt(i)) {
+                        case 34:
+                            char = '&quot;';
+                            break;
+                        case 60:
+                            char = '&lt;';
+                            break;
+                        case 62:
+                            char = '&gt;';
+                            break;
+                        case 38:
+                            char = '&amp;';
+                            break;
+                        case 39:
+                            char = '&#39;';
+                            break;
+                        default:
+                            continue;
+                    }
+                    if (index !== i) {
+                        result += txt.substring(index, i);
+                    }
+                    index = i + 1;
+                    result += char;
+                }
+                if (index !== i) {
+                    return result + txt.substring(index, i);
+                } else {
+                    return result;
+                }
+            }
+        });
         return {
             // 默认逻辑开始标签
             logicOpenTag: options.logicOpenTag || '<%',
@@ -45,52 +91,7 @@
             // 初始化已加载模板存储容器
             templates: {},
             //默认的过滤器
-            filters: options.filters || {
-                escape: (txt) => {
-                    if (typeof txt === 'undefined') {
-                        return '';
-                    }
-                    if (typeof txt !== 'string') {
-                        return txt;
-                    }
-                    let result = '';
-                    let i = 0;
-                    let index;
-                    let char;
-                    const len = txt.length
-                    for (index = 0; i < len; ++i) {
-                        switch (txt.charCodeAt(i)) {
-                            case 34:
-                                char = '&quot;';
-                                break;
-                            case 60:
-                                char = '&lt;';
-                                break;
-                            case 62:
-                                char = '&gt;';
-                                break;
-                            case 38:
-                                char = '&amp;';
-                                break;
-                            case 39:
-                                char = '&#39;';
-                                break;
-                            default:
-                                continue;
-                        }
-                        if (index !== i) {
-                            result += txt.substring(index, i);
-                        }
-                        index = i + 1;
-                        result += char;
-                    }
-                    if (index !== i) {
-                        return result + txt.substring(index, i);
-                    } else {
-                        return result;
-                    }
-                }
-            }
+            filters: filters
         };
     };
 
