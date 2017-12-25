@@ -16,8 +16,7 @@
 })(this, () => {
     'use strict'
 
-    const escapeReg = /["<>'&]/;
-
+    // 合并多个object
     const mixin = (from, to) => {
         for (let key in from) {
             if (!to[key]) {
@@ -27,53 +26,56 @@
         return to;
     };
 
+    // html转义
+    const escape = (txt) => {
+        if (typeof txt === 'undefined') {
+            return '';
+        }
+        if (typeof txt !== 'string') {
+            return txt;
+        }
+        let result = '';
+        let i = 0;
+        let index;
+        let char;
+        const len = txt.length
+        for (index = 0; i < len; ++i) {
+            switch (txt.charCodeAt(i)) {
+                case 34:
+                    char = '&quot;';
+                    break;
+                case 60:
+                    char = '&lt;';
+                    break;
+                case 62:
+                    char = '&gt;';
+                    break;
+                case 38:
+                    char = '&amp;';
+                    break;
+                case 39:
+                    char = '&#39;';
+                    break;
+                default:
+                    continue;
+            }
+            if (index !== i) {
+                result += txt.substring(index, i);
+            }
+            index = i + 1;
+            result += char;
+        }
+        if (index !== i) {
+            return result + txt.substring(index, i);
+        } else {
+            return result;
+        }
+    }
+
     const getConfig = (options) => {
         options = options || {};
         const filters = mixin(options.filters || {}, {
-            escape: (txt) => {
-                if (typeof txt === 'undefined') {
-                    return '';
-                }
-                if (typeof txt !== 'string') {
-                    return txt;
-                }
-                let result = '';
-                let i = 0;
-                let index;
-                let char;
-                const len = txt.length
-                for (index = 0; i < len; ++i) {
-                    switch (txt.charCodeAt(i)) {
-                        case 34:
-                            char = '&quot;';
-                            break;
-                        case 60:
-                            char = '&lt;';
-                            break;
-                        case 62:
-                            char = '&gt;';
-                            break;
-                        case 38:
-                            char = '&amp;';
-                            break;
-                        case 39:
-                            char = '&#39;';
-                            break;
-                        default:
-                            continue;
-                    }
-                    if (index !== i) {
-                        result += txt.substring(index, i);
-                    }
-                    index = i + 1;
-                    result += char;
-                }
-                if (index !== i) {
-                    return result + txt.substring(index, i);
-                } else {
-                    return result;
-                }
-            }
+            escape: escape
         });
         return {
             // 默认逻辑开始标签
@@ -139,7 +141,7 @@
     /**
      * 添加处理过滤数据方法
      * @param {string} name 需要调用的方法名称
-     * @param {*} ... 传入方法的不定长参数
+     * @param {*} data 传入方法的不定长参数
      * @return {string} 返回过滤之后的结果
      */
     Simplite.filter = function (name, ...data) {
@@ -149,8 +151,7 @@
     /**
      * 引入子模板
      * @param {string} name 子模板名称
-     * @param {*} data 用来填充模板的数据
-     * @param {*?} data 可以有多个数据源
+     * @param {*?} extra 可以有多个数据源
      * @return {string} 返回使用data数据填充好模板的html字符串
      */
     Simplite.include = function (name, ...extra) {
@@ -244,8 +245,7 @@
      * @return {string} 返回使用data数据填充好模板的html字符串
      */
     Simplite.render = (name, data, simplite) => {
-        simplite = simplite || Simplite;
-        return simplite.compiles[name](data);
+        return (simplite || Simplite).compiles[name](data);
     };
 
     /**
@@ -281,7 +281,7 @@
         .replace(logicOpenTagReg, '";')
         .replace(logicCloseTagReg, '\n_o+="')
         .replace(keywordReg, keywordHandler);
-        return '"use strict"\nlet _t=this,_o="' + codeBlock + '";return _o;';
+        return '"use strict"\nvar _t=this,_o="' + codeBlock + '";return _o;';
     };
 
     /**
