@@ -67,9 +67,8 @@
         }
         if (index !== i) {
             return result + txt.substring(index, i);
-        } else {
-            return result;
         }
+        return result;
     }
 
     const getConfig = (options) => {
@@ -160,7 +159,7 @@
         if (len > 1) {
             const _this = extra[len - 1];
             data = {};
-            for (let i = 0; i < len - 1; i++) {
+            for (let i = 0; i < len - 1; ++i) {
                 let arg = extra[i];
                 if (arg != null) {
                     if (arg.constructor === Object) {

@@ -7,7 +7,7 @@ define(function (require) {
             return '<div style="background: red;">ttest filter被转义的html元素</div>';
         });
         var html = simplite.render('table-tpl', {
-            name: '外层数据name',
+            name: '外层数ttt据name',
             gender: '男',
             age: 12,
             c: {

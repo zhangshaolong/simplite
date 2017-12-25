@@ -86,9 +86,8 @@
                     }
                     if (index !== i) {
                         return result + txt.substring(index, i);
-                    } else {
-                        return result;
                     }
+                    return result;
                 }
             }
         };
