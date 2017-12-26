@@ -18,6 +18,48 @@
 
     var slice = Array.prototype.slice;
 
+    // 分析关键词语法
+    var keywordReg = /(^|[^\s])\s*(include|filter)\s*\(([^;]+)\)/g;
+    // 分析filter关键词语法
+    var filterReg = /^\s*filter\(/g;
+    var quotReg = /"/g;
+    var slashReg = /\//g;
+    var stubReg = /\-\-s\-\-/g;
+    var stubStr = '--s--';
+    var commentAndTagBlankTrimReg = /(?:(["'])[\s\S]*?\1)|(?:\/\/.*\n)|(?:\/\*([\s\S])*?\*\/)|(?:\>\s+\<)|(?:\s+)/g;
+
+    var commentAndTagBlankTrimHandler = function (all) {
+        var start = all.charAt(0);
+        switch (start) {
+            case '/' :
+                return '';
+            case '"' :
+            case "'" :
+                return all;
+            case '>' :
+                return '><';
+            default :
+                return ' ';
+        }
+    };
+
+    var attrHandler = function (all, p) {
+        if (p.charAt(0) === '#') {
+            return '"+_t.defaultAttr(_t.filter("escape",' + p.slice(1).replace(filterReg, '_t.filter(') + '))+"';
+        }
+        return '"+_t.defaultAttr(' + p.replace(filterReg, '_t.filter(') + ')+"';
+    };
+
+    var htmlHandler = function (all, simplite) {
+        var attrs = [];
+        return all.replace(simplite.attrTagReg, function (attr) {
+            attrs.push(attr);
+            return stubStr;
+        }).replace(slashReg, '\\/').replace(quotReg, '\\"').replace(stubReg, function () {
+            return attrs.shift();
+        });
+    };
+
     var mixin = function (from, to) {
         for (var key in from) {
             if (!to[key]) {
@@ -102,8 +144,6 @@
         mixin(getConfig(options), this);
     };
 
-    mixin(getConfig(), Simplite);
-
     /**
      * 为模板引擎注入过滤方法
      * @param {string} name 注入的方法名称
@@ -176,46 +216,6 @@
             }
         }
         return Simplite.render(name, data, this);
-    };
-
-    // 分析关键词语法
-    var keywordReg = /(^|[^\s])\s*(include|filter)\s*\(([^;]+)\)/g;
-    // 分析filter关键词语法
-    var filterReg = /^\s*filter\(/g;
-    var quotReg = /"/g;
-    var slashReg = /\//g;
-    var stubReg = /\-\-s\-\-/g;
-    var stubStr = '--s--';
-    var commentAndTagBlankTrimReg = /(?:(["'])[\s\S]*?\1)|(?:\/\/.*\n)|(?:\/\*([\s\S])*?\*\/)|(?:\>\s+\<)|(?:\s+)/g;
-
-    var commentAndTagBlankTrimHandler = function (all) {
-        var start = all.charAt(0);
-        switch (start) {
-            case '/' :
-                return '';
-            case '"' :
-            case "'" :
-                return all;
-            case '>' :
-                return '><';
-            default :
-                return ' ';
-        }
-    };
-    var attrHandler = function (all, p) {
-        if (p.charAt(0) === '#') {
-            return '"+_t.defaultAttr(_t.filter("escape",' + p.slice(1).replace(filterReg, '_t.filter(') + '))+"';
-        }
-        return '"+_t.defaultAttr(' + p.replace(filterReg, '_t.filter(') + ')+"';
-    };
-    var htmlHandler = function (all, simplite) {
-        var attrs = [];
-        return all.replace(simplite.attrTagReg, function (attr) {
-            attrs.push(attr);
-            return stubStr;
-        }).replace(slashReg, '\\/').replace(quotReg, '\\"').replace(stubReg, function () {
-            return attrs.shift();
-        });
     };
 
     Simplite.compile = function (name, simplite) {
@@ -359,6 +359,8 @@
     Simplite.prototype.defaultAttr = function (val) {
         return Simplite.defaultAttr(val);
     };
+
+    mixin(getConfig(), Simplite);
 
     return Simplite;
 });
