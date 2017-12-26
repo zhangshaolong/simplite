@@ -25,6 +25,10 @@
     const stubReg = /\-\-s\-\-/g;
     const stubStr = '--s--';
     const commentAndTagBlankTrimReg = /(?:(["'])[\s\S]*?\1)|(?:\/\/.*\n)|(?:\/\*([\s\S])*?\*\/)|(?:\>\s+\<)|(?:\s+)/g;
+    const logicOpenSign = '";';
+    const logicCloseSign = '\n_o+="';
+    const startBlock = '"use strict"\nvar _t=this,_o="';
+    const endBlock = '";return _o;';
 
     const commentAndTagBlankTrimHandler = (all) => {
         const start = all.charCodeAt(0);
@@ -48,14 +52,21 @@
         return '"+_t.defaultAttr(' + p.replace(filterReg, '_t.filter(') + ')+"';
     };
 
-    const htmlHandler = (all, simplite) => {
+    const htmlHandler = (all, attrTagReg) => {
         const attrs = [];
-        return all.replace(simplite.attrTagReg, (attr) => {
+        return all.replace(attrTagReg, (attr) => {
             attrs.push(attr);
             return stubStr;
         }).replace(slashReg, '\\/').replace(quotReg, '\\"').replace(stubReg, () => {
             return attrs.shift();
         });
+    };
+
+    const keywordHandler = (all, pre, keyword, args, dataKey) => {
+        if (pre === '.') {
+            return all;
+        }
+        return (pre || '') + ' _o+=_t.' + keyword + '(' + args + ',' + dataKey + ')\n';
     };
 
     // 合并多个object
@@ -254,13 +265,6 @@
      * @return {string} 返回函数体的字符串形式
      */
     Simplite.toCodeBlock = (template, simplite) => {
-        const keywordHandler = (all, pre, keyword, args) => {
-            if (pre === '.') {
-                return all;
-            }
-            return (pre || '') + ' _o+=_t.' + keyword + '(' + args + ',' + simplite.dataKey + ')\n';
-        };
-
         simplite = simplite || Simplite;
         let attrTagReg = simplite.attrTagReg;
         let logicOpenTagReg = simplite.logicOpenTagReg;
@@ -273,14 +277,16 @@
             htmlReg = simplite.htmlReg = RegExp('(?:' + simplite.logicCloseTag  + '|^)(?:(?!' + simplite.logicOpenTag + ')[\\s\\S])+?(?:$|' + simplite.logicOpenTag + ')', 'g');
         }
         const codeBlock = template.replace(htmlReg, (all) => {
-            return htmlHandler(all, simplite);
+            return htmlHandler(all, simplite.attrTagReg);
         })
         .replace(commentAndTagBlankTrimReg, commentAndTagBlankTrimHandler)
         .replace(attrTagReg, attrHandler)
-        .replace(logicOpenTagReg, '";')
-        .replace(logicCloseTagReg, '\n_o+="')
-        .replace(keywordReg, keywordHandler);
-        return '"use strict"\nvar _t=this,_o="' + codeBlock + '";return _o;';
+        .replace(logicOpenTagReg, logicOpenSign)
+        .replace(logicCloseTagReg, logicCloseSign)
+        .replace(keywordReg, (all, pre, keyword, args) => {
+            return keywordHandler(all, pre, keyword, args, simplite.dataKey);
+        });
+        return startBlock + codeBlock + endBlock;
     };
 
     /**
