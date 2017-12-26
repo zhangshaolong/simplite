@@ -360,7 +360,5 @@
         return Simplite.defaultAttr(val);
     };
 
-    mixin(getConfig(), Simplite);
-
-    return Simplite;
+    return mixin(getConfig(), Simplite);
 });
