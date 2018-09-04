@@ -5,7 +5,7 @@
 <title>template test</title>
 <script src="https://www.highcharts.com/lib/jquery-3.1.1.js"></script>
 <script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+<script src="jquery.tmpl.js"></script>
 <script src="doT.min.js"></script>
 <script src="juicer.js"></script>
 <script src="handlebars-v4.0.5.js"></script>
@@ -13,11 +13,12 @@
 <script src="jquery.tmpl.js"></script>
 <script src="http://underscorejs.org/underscore.js"></script>
 <script src="../src/simplite.js"></script>
+<script src="../src/simplite-es6.js"></script>
 <script src="etpl.js"></script>
 <script src="artTemplate.min.js"></script>
 <script>
 // 数据量
-var length = 10000;
+var length = 100000;
 // 渲染次数
 var number = 100;
 var data = {
@@ -36,32 +37,32 @@ for (var i = 0; i < length; i ++) {
 
 // 待测试的引擎列表
 var testList = {list: [
-    // {
-    //     name: 'artTemplate',
-    //     tester: function () {
-    //         template.isEscape = false;
-    //         var source = document.getElementById('template').innerHTML;
-    //         for (var i = 0; i < number; i ++) {
-    //             var fn = template.compile(source);
-    //             fn(data);
-    //         }
-    //     },
-    //     comp: function () {
-    //         template.isEscape = false;
-    //         var source = document.getElementById('template').innerHTML;
-    //         for (var i = 0; i < number; i ++) {
-    //             var fn = template.compile(source);
-    //         }
-    //     },
-    //     render: function () {
-    //         template.isEscape = false;
-    //         var source = document.getElementById('template').innerHTML;
-    //         var fn = template.compile(source);
-    //         for (var i = 0; i < number; i ++) {
-    //             fn(data);
-    //         }
-    //     }
-    // },
+    {
+        name: 'artTemplate',
+        tester: function () {
+            template.isEscape = false;
+            var source = document.getElementById('template').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var fn = template.compile(source);
+                fn(data);
+            }
+        },
+        comp: function () {
+            template.isEscape = false;
+            var source = document.getElementById('template').innerHTML;
+            for (var i = 0; i < number; i ++) {
+                var fn = template.compile(source);
+            }
+        },
+        render: function () {
+            template.isEscape = false;
+            var source = document.getElementById('template').innerHTML;
+            var fn = template.compile(source);
+            for (var i = 0; i < number; i ++) {
+                fn(data);
+            }
+        }
+    },
     {
         name: 'juicer',
         tester: function () {
@@ -139,6 +140,35 @@ var testList = {list: [
             var source = document.getElementById('simplite').innerHTML;
             Simplite.addTemplate('test', source);
             var render = Simplite.compile('test');
+            for (var i = 0; i < number; i ++) {
+                render(data);
+            }
+        }
+    },
+    {
+        name: 'simplitees6',
+        tester: function () {
+            var source = document.getElementById('simplite').innerHTML;
+            SimpliteES6.addTemplate('test', source);
+            var compile = SimpliteES6.compile;
+            for (var i = 0; i < number; i ++) {
+                var render = compile('test');
+                render(data);
+            }
+        },
+        comp: function () {
+            var source = document.getElementById('simplite').innerHTML;
+            SimpliteES6.addTemplate('test', source);
+            var compile = SimpliteES6.compile;
+            for (var i = 0; i < number; i ++) {
+                var render = compile('test');
+                //console.log(render)
+            }
+        },
+        render: function () {
+            var source = document.getElementById('simplite').innerHTML;
+            SimpliteES6.addTemplate('test', source);
+            var render = SimpliteES6.compile('test');
             for (var i = 0; i < number; i ++) {
                 render(data);
             }
@@ -265,35 +295,35 @@ var testList = {list: [
             }
         }
     },
-    {
-        name: 'baiduTemplate',
-        tester: function () {
-            var bt = baidu.template;
-            bt.ESCAPE = false;
-            for (var i = 0; i < number; i ++) {
-                var fun = baidu.template('baidu-template');
-                var html1 = fun(data);
-                // bt('baidu-template', data);
-            }
-        },
-        comp: function () {
-            var bt = baidu.template;
-            bt.ESCAPE = false;
-            for (var i = 0; i < number; i ++) {
-                var fun = baidu.template('baidu-template');
-                // var html1 = fun(data);
-                // bt('baidu-template', data);
-            }
-        },
-        render: function () {
-            var bt = baidu.template;
-            bt.ESCAPE = false;
-            var fun = baidu.template('baidu-template');
-            for (var i = 0; i < number; i ++) {
-                var html1 = fun(data);
-            }
-        }
-    },
+    // {
+    //     name: 'baiduTemplate',
+    //     tester: function () {
+    //         var bt = baidu.template;
+    //         bt.ESCAPE = false;
+    //         for (var i = 0; i < number; i ++) {
+    //             var fun = baidu.template('baidu-template');
+    //             var html1 = fun(data);
+    //             // bt('baidu-template', data);
+    //         }
+    //     },
+    //     comp: function () {
+    //         var bt = baidu.template;
+    //         bt.ESCAPE = false;
+    //         for (var i = 0; i < number; i ++) {
+    //             var fun = baidu.template('baidu-template');
+    //             // var html1 = fun(data);
+    //             // bt('baidu-template', data);
+    //         }
+    //     },
+    //     render: function () {
+    //         var bt = baidu.template;
+    //         bt.ESCAPE = false;
+    //         var fun = baidu.template('baidu-template');
+    //         for (var i = 0; i < number; i ++) {
+    //             var html1 = fun(data);
+    //         }
+    //     }
+    // },
 // jqueryTmpl 太慢，可能导致浏览器停止响应
 /*{
 name: 'jqueryTmpl',

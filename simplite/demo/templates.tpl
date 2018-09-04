@@ -2,26 +2,28 @@
 <table>
     <head class="aaa">
         <tr>
-            <th class="{{/**alert(1212);*/_this.name}}  {{_this.gender}} <%
+            <th class="{{/**alert(1212),*/_this.name}}  {{_this.gender}} <%
 
             if (true) {%>aaa<%}%>">/**sdfs*/姓名</th>
             <th>性别</th>
             <th>switch条件：<%
+                    var text = '';
                     switch (new Date().getTime() % 2) {
                         case 0:
-                %>
-                            000000
-                <%
+                            text = '0000';
                             break;
                         case 1:
-                %>
-                            111111
-                <%
+                            text = '1111';
+                    %>
+                            aaaa
+                    <%
                             break;
                         default:
                             break;
                     }
-                %></th>
+                %>
+                     {{text}}
+                </th>
         </tr>
     </head>
     <body>

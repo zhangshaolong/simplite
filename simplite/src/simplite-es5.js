@@ -2,10 +2,10 @@
  * @file 超轻量前端模板引擎，支持无限嵌套，逻辑嵌套模板，模板嵌套逻辑； 标准js语法，灵活易用，超便捷指定数据
  * @author：张少龙（zhangshaolongjj@163.com）
  */
-((root, factory) => {
-    const simplite = factory();
+(function (root, factory) {
+    var simplite = factory();
     if (typeof define === 'function') {
-        define(() => {
+        define(function () {
             return simplite;
         });
     } else if (typeof require === 'undefined') {
@@ -13,65 +13,55 @@
     } else { // node端接口
         module.exports = simplite;
     }
-})(this, () => {
+})(this, function () {
     'use strict'
 
-    // 分析关键词语法
-    const keywordReg = /(^|[^\s])\s*(include|filter)\s*\(([^;]+)\)/g;
-    // 分析filter关键词语法
-    const filterReg = /^\s*filter\(/g;
-    const quotReg = /"/g;
-    const slashReg = /\//g;
-    const stubReg = /\-\-s\-\-/g;
-    const stubStr = '--s--';
-    const commentAndTagBlankTrimReg = /(?:(["'])[\s\S]*?\1)|(?:\/\/.*\n)|(?:\/\*([\s\S])*?\*\/)|(?:\>\s+\<)|(?:\s+)/g;
-    const logicOpenSign = '";';
-    const logicCloseSign = '\n_o+="';
-    const startBlock = '"use strict"\nvar _t=this,_o="';
-    const endBlock = '";return _o;';
+    var slice = Array.prototype.slice;
 
-    const commentAndTagBlankTrimHandler = (all) => {
-        const start = all.charCodeAt(0);
+    // 分析关键词语法
+    var keywordReg = /(^|[^\s])\s*(include|filter)\s*\(([^;]+)\)/g;
+    // 分析filter关键词语法
+    var filterReg = /^\s*filter\(/g;
+    var quotReg = /"/g;
+    var slashReg = /\//g;
+    var stubReg = /\-\-s\-\-/g;
+    var stubStr = '--s--';
+    var commentAndTagBlankTrimReg = /(?:(["'])[\s\S]*?\1)|(?:\/\/.*\n)|(?:\/\*([\s\S])*?\*\/)|(?:\>\s+\<)|(?:\s+)/g;
+
+    var commentAndTagBlankTrimHandler = function (all) {
+        var start = all.charAt(0);
         switch (start) {
-            case 47 :
+            case '/' :
                 return '';
-            case 34 :
-            case 39 :
+            case '"' :
+            case "'" :
                 return all;
-            case 62 :
+            case '>' :
                 return '><';
             default :
                 return ' ';
         }
     };
 
-    const attrHandler = (all, p) => {
-        if (p.charCodeAt(0) === 35) {
+    var attrHandler = function (all, p) {
+        if (p.charAt(0) === '#') {
             return '"+_t.defaultAttr(_t.filter("escape",' + p.slice(1).replace(filterReg, '_t.filter(') + '))+"';
         }
         return '"+_t.defaultAttr(' + p.replace(filterReg, '_t.filter(') + ')+"';
     };
 
-    const htmlHandler = (all, attrTagReg) => {
-        const attrs = [];
-        return all.replace(attrTagReg, (attr) => {
+    var htmlHandler = function (all, simplite) {
+        var attrs = [];
+        return all.replace(simplite.attrTagReg, function (attr) {
             attrs.push(attr);
             return stubStr;
-        }).replace(slashReg, '\\/').replace(quotReg, '\\"').replace(stubReg, () => {
+        }).replace(slashReg, '\\/').replace(quotReg, '\\"').replace(stubReg, function () {
             return attrs.shift();
         });
     };
 
-    const keywordHandler = (all, pre, keyword, args, dataKey) => {
-        if (pre === '.') {
-            return all;
-        }
-        return (pre || '') + ' _o+=_t.' + keyword + '(' + args + ',' + dataKey + ')\n';
-    };
-
-    // 合并多个object
-    const mixin = (from, to) => {
-        for (let key in from) {
+    var mixin = function (from, to) {
+        for (var key in from) {
             if (!to[key]) {
                 to[key] = from[key];
             }
@@ -79,56 +69,8 @@
         return to;
     };
 
-    // html转义
-    const escape = (txt) => {
-        if (typeof txt === 'undefined') {
-            return '';
-        }
-        if (typeof txt !== 'string') {
-            return txt;
-        }
-        let result = '';
-        let i = 0;
-        let index;
-        let char;
-        const len = txt.length
-        for (index = 0; i < len; ++i) {
-            switch (txt.charCodeAt(i)) {
-                case 34:
-                    char = '&quot;';
-                    break;
-                case 60:
-                    char = '&lt;';
-                    break;
-                case 62:
-                    char = '&gt;';
-                    break;
-                case 38:
-                    char = '&amp;';
-                    break;
-                case 39:
-                    char = '&#39;';
-                    break;
-                default:
-                    continue;
-            }
-            if (index !== i) {
-                result += txt.substring(index, i);
-            }
-            index = i + 1;
-            result += char;
-        }
-        if (index !== i) {
-            return result + txt.substring(index, i);
-        }
-        return result;
-    }
-
-    const getConfig = (options) => {
+    var getConfig = function (options) {
         options = options || {};
-        const filters = mixin(options.filters || {}, {
-            escape: escape
-        });
         return {
             // 默认逻辑开始标签
             logicOpenTag: options.logicOpenTag || '<%',
@@ -145,7 +87,51 @@
             // 初始化已加载模板存储容器
             templates: {},
             //默认的过滤器
-            filters: filters
+            filters: options.filters || {
+                escape: function (txt) {
+                    if (typeof txt === 'undefined') {
+                        return '';
+                    }
+                    if (typeof txt !== 'string') {
+                        return txt;
+                    }
+                    let result = '';
+                    let i = 0;
+                    let index;
+                    let char;
+                    const len = txt.length
+                    for (index = 0; i < len; ++i) {
+                        switch (txt.charCodeAt(i)) {
+                            case 34:
+                                char = '&quot;';
+                                break;
+                            case 60:
+                                char = '&lt;';
+                                break;
+                            case 62:
+                                char = '&gt;';
+                                break;
+                            case 38:
+                                char = '&amp;';
+                                break;
+                            case 39:
+                                char = '&#39;';
+                                break;
+                            default:
+                                continue;
+                        }
+                        if (index !== i) {
+                            result += txt.substring(index, i);
+                        }
+                        index = i + 1;
+                        result += char;
+                    }
+                    if (index !== i) {
+                        return result + txt.substring(index, i);
+                    }
+                    return result;
+                }
+            }
         };
     };
 
@@ -154,7 +140,7 @@
      * @constructor
      * @param {Object} options 初始化配置参数
      */
-    const Simplite = function (options) {
+    var Simplite = function (options) {
         mixin(getConfig(options), this);
     };
 
@@ -164,7 +150,7 @@
      * @param {Function} fun 注入的方法
      * @param {Simplite?} simplite 当前的Simplite实例
      */
-    Simplite.addFilter = (name, fun, simplite) => {
+    Simplite.addFilter = function (name, fun, simplite) {
         (simplite || Simplite).filters[name] = fun;
     };
 
@@ -174,7 +160,7 @@
      * @param {Simplite?} simplite 当前的Simplite实例
      * @return {Function} fun 注入的方法
      */
-    Simplite.getFilter = (name, simplite) => {
+    Simplite.getFilter = function (name, simplite) {
         return (simplite || Simplite).filters[name];
     };
 
@@ -184,37 +170,36 @@
      * @param {string} template 模板内容字符串
      * @param {Simplite?} simplite 当前的Simplite实例
      */
-    Simplite.addTemplate = (name, template, simplite) => {
+    Simplite.addTemplate = function (name, template, simplite) {
         (simplite || Simplite).templates[name] = template;
     };
 
     /**
      * 添加处理过滤数据方法
      * @param {string} name 需要调用的方法名称
-     * @param {*} data 传入方法的不定长参数
+     * @param {*} ... 传入方法的不定长参数
      * @return {string} 返回过滤之后的结果
      */
-    Simplite.filter = function (name, ...data) {
-        return this.filters[name].apply(this, data);
+    Simplite.filter = function (name) {
+        return this.filters[name].apply(this, slice.call(arguments, 1));
     };
 
     /**
      * 引入子模板
      * @param {string} name 子模板名称
-     * @param {*?} extra 可以有多个数据源
+     * @param {*?} data 用来填充模板的数据
      * @return {string} 返回使用data数据填充好模板的html字符串
      */
-    Simplite.include = function (name, ...extra) {
-        const len = extra.length
-        let data
-        if (len > 1) {
-            const _this = extra[len - 1];
+    Simplite.include = function (name, data) {
+        var len = arguments.length;
+        if (len > 2) {
+            var _this = arguments[len - 1];
             data = {};
-            for (let i = 0; i < len - 1; ++i) {
-                let arg = extra[i];
+            for (var i = 1; i < len - 1; i++) {
+                var arg = arguments[i];
                 if (arg != null) {
                     if (arg.constructor === Object) {
-                        for (let key in arg) {
+                        for (var key in arg) {
                             data[key] = arg[key];
                         }
                     } else {
@@ -223,23 +208,21 @@
                 }
             }
             if (data.constructor === Object && _this != null && _this.constructor === Object) {
-                for (let key in _this) {
+                for (var key in _this) {
                     if (!data.hasOwnProperty(key)) {
                         data[key] = _this[key];
                     }
                 }
             }
-        } else {
-            data = extra[0]
         }
         return Simplite.render(name, data, this);
     };
 
-    Simplite.compile = (name, simplite) => {
+    Simplite.compile = function (name, simplite) {
         simplite = simplite || Simplite;
         try {
-            const renderer = Function (simplite.dataKey, simplite.toCodeBlock(simplite.templates[name], simplite));
-            return simplite.compiles[name] = (data) => {
+            var renderer = Function (simplite.dataKey, simplite.toCodeBlock(simplite.templates[name], simplite));
+            return simplite.compiles[name] = function (data) {
                 return renderer.call(simplite, data);
             };
         } catch (e) {
@@ -254,8 +237,9 @@
      * @param {*?} data 用来填充模板的数据
      * @return {string} 返回使用data数据填充好模板的html字符串
      */
-    Simplite.render = (name, data, simplite) => {
-        return (simplite || Simplite).compiles[name](data);
+    Simplite.render = function (name, data, simplite) {
+        simplite = simplite || Simplite;
+        return simplite.compiles[name](data);
     };
 
     /**
@@ -264,29 +248,34 @@
      * @param {Simplite} simplite Simplite对象，默认为Simplite类
      * @return {string} 返回函数体的字符串形式
      */
-    Simplite.toCodeBlock = (template, simplite) => {
+    Simplite.toCodeBlock = function (template, simplite) {
+        var keywordHandler = function (all, pre, keyword, args) {
+            if (pre === '.') {
+                return all;
+            }
+            return (pre || '') + ' _o+=_t.' + keyword + '(' + args + ',' + simplite.dataKey + ')\n';
+        };
+
         simplite = simplite || Simplite;
-        let attrTagReg = simplite.attrTagReg;
-        let logicOpenTagReg = simplite.logicOpenTagReg;
-        let logicCloseTagReg = simplite.logicCloseTagReg;
-        let htmlReg = simplite.htmlReg;
+        var attrTagReg = simplite.attrTagReg;
+        var logicOpenTagReg = simplite.logicOpenTagReg;
+        var logicCloseTagReg = simplite.logicCloseTagReg;
+        var htmlReg = simplite.htmlReg;
         if (!attrTagReg) {
             attrTagReg = simplite.attrTagReg = RegExp(simplite.attrOpenTag + '([\\s\\S]+?)' + simplite.attrCloseTag, 'g');
             logicOpenTagReg = simplite.logicOpenTagReg = RegExp('(?=\\s?)' + simplite.logicOpenTag + '\\s?', 'g');
             logicCloseTagReg = simplite.logicCloseTagReg = RegExp('\\s?' + simplite.logicCloseTag + '(?=\\s?)', 'g');
             htmlReg = simplite.htmlReg = RegExp('(?:' + simplite.logicCloseTag  + '|^)(?:(?!' + simplite.logicOpenTag + ')[\\s\\S])+?(?:$|' + simplite.logicOpenTag + ')', 'g');
         }
-        const codeBlock = template.replace(htmlReg, (all) => {
-            return htmlHandler(all, simplite.attrTagReg);
+        var codeBlock = template.replace(htmlReg, function (all) {
+            return htmlHandler(all, simplite);
         })
         .replace(commentAndTagBlankTrimReg, commentAndTagBlankTrimHandler)
         .replace(attrTagReg, attrHandler)
-        .replace(logicOpenTagReg, logicOpenSign)
-        .replace(logicCloseTagReg, logicCloseSign)
-        .replace(keywordReg, (all, pre, keyword, args) => {
-            return keywordHandler(all, pre, keyword, args, simplite.dataKey);
-        });
-        return startBlock + codeBlock + endBlock;
+        .replace(logicOpenTagReg, '";')
+        .replace(logicCloseTagReg, '\n_o+="')
+        .replace(keywordReg, keywordHandler);
+        return '"use strict"\nvar _t=this,_o="' + codeBlock + '";return _o;';
     };
 
     /**
@@ -294,7 +283,7 @@
      * @param {string} val 原始的属性值
      * @return {string} 当原始值不存在时的默认值
      */
-    Simplite.defaultAttr = (val) => {
+    Simplite.defaultAttr = function (val) {
         return val == null ? '' : val;
     };
 
@@ -349,8 +338,8 @@
      * @param {string} name 注入的方法名称
      * @param {*} ... 传入方法的不定长参数
      */
-    Simplite.prototype.filter = function (name, ...data) {
-        return Simplite.filter.apply(this, [name].concat(data));
+    Simplite.prototype.filter = function (name) {
+        return Simplite.filter.apply(this, arguments);
     };
 
     /**
@@ -358,8 +347,8 @@
      * @param {string} name 注入的方法名称
      * @param {*?} data 给模板传入的数据集
      */
-    Simplite.prototype.include = function (name, ...data) {
-        return Simplite.include.apply(this, [name].concat(data));
+    Simplite.prototype.include = function (name, data) {
+        return Simplite.include.apply(this, arguments);
     };
 
     /**
@@ -367,7 +356,7 @@
      * @param {string} val 原始的属性值
      * @return {string} 当原始值不存在时的默认值
      */
-    Simplite.prototype.defaultAttr = (val) => {
+    Simplite.prototype.defaultAttr = function (val) {
         return Simplite.defaultAttr(val);
     };
 
