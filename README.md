@@ -17,3 +17,8 @@
 - 使用说明：
     http://www.cnblogs.com/centre/p/4299198.html
 
+
+[simplite-loader](https://github.com/zhangshaolong/simplite-loader "simplite loader")
+
+[a webpack+es6+simplite+simplite-loader demo](https://github.com/zhangshaolong/scaffold "scaffold")
+
