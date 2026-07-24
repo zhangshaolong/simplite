@@ -158,6 +158,8 @@
         mixin(getConfig(options), this);
     };
 
+    Simplite.escape = escape;
+
     /**
      * 为模板引擎注入过滤方法
      * @param {string} name 注入的方法名称
