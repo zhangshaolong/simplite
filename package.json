@@ -1,6 +1,6 @@
 {
   "name": "simplite",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "browser and node server html template",
   "main": "simplite/src/simplite.js",
   "scripts": {
