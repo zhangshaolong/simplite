@@ -1,6 +1,6 @@
 {
   "name": "simplite",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "browser and node server html template",
   "main": "dist/index.js",
   "files": [
@@ -13,6 +13,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zhangshaolong/simplite.git"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
   },
   "keywords": [
     "browser",
