@@ -1,5 +1,5 @@
 /**
- * @file 超轻量前端模板引擎，支持无限嵌套，逻辑嵌套模板，模板嵌套逻辑； 标准js语法，灵活易用，超便捷指定数据
+ * @file 超轻量前端模板引擎，支持无限嵌套，逻辑嵌套模板，模板嵌套逻辑； 标准js语法，支持`模板字符串`
  * @author：张少龙（zhangshaolongjj@163.com）
  */
 ((root, factory) => {
@@ -16,7 +16,6 @@
   }
 })(this, () => {
   "use strict";
-
   // 分析关键词语法
   const keywordReg = /(^|[^\s])\s*(include|filter)\s*\(([^;]+)\)/g;
   // 分析filter关键词语法
@@ -25,18 +24,21 @@
   const slashReg = /\//g;
   const stubReg = /\-\-s\-\-/g;
   const stubStr = "--s--";
+  // 正则增加反引号`分组，完整保留三种字符串内容，不再截断模板字符串
   const commentAndTagBlankTrimReg =
-    /(?:(["'])[\s\S]*?\1)|(?:\/\/.*\n)|(?:\/\*([\s\S])*?\*\/)|(?:\>\s+\<)|(?:\s+)/g;
+    /(?:(`[\s\S]*?`)|(["'])[\s\S]*?\2)|(?:\/\/.*\n)|(?:\/\*([\s\S])*?\*\/)|(?:\>\s+\<)|(?:\s+)/g;
   const logicOpenSign = '";';
   const logicCloseSign = '\n_o+="';
   const startBlock = '"use strict"\nvar _t=this,_o="';
   const endBlock = '";return _o;';
-
-  const commentAndTagBlankTrimHandler = (all) => {
+  // 修改handler：新增反引号分组原样返回，保证`模板字符串`完整不被压缩
+  const commentAndTagBlankTrimHandler = (all, tickStr, quoteStr) => {
     const start = all.charCodeAt(0);
     switch (start) {
       case 47:
         return "";
+      case 96: // ` 反引号模板字符串，原样保留
+        return all;
       case 34:
       case 39:
         return all;
@@ -46,7 +48,6 @@
         return " ";
     }
   };
-
   const attrHandler = (all, p) => {
     if (p.charCodeAt(0) === 35) {
       return (
@@ -57,7 +58,6 @@
     }
     return '"+_t.defaultAttr(' + p.replace(filterReg, "_t.filter(") + ')+"';
   };
-
   const htmlHandler = (all, attrTagReg) => {
     const attrs = [];
     return all
@@ -71,7 +71,6 @@
         return attrs.shift();
       });
   };
-
   const keywordHandler = (all, pre, keyword, args, dataKey) => {
     if (pre === ".") {
       return all;
@@ -80,7 +79,6 @@
       (pre || "") + " _o+=_t." + keyword + "(" + args + "," + dataKey + ")\n"
     );
   };
-
   // 合并多个object
   const mixin = (from, to) => {
     for (let key in from) {
@@ -90,7 +88,6 @@
     }
     return to;
   };
-
   // html转义
   const escape = (txt) => {
     if (typeof txt === "undefined") {
@@ -135,7 +132,6 @@
     }
     return result;
   };
-
   const getConfig = (options) => {
     options = options || {};
     const filters = mixin(options.filters || {}, {
@@ -160,7 +156,6 @@
       filters: filters,
     };
   };
-
   /**
    * 模板对象构造器，可以使用new初始化模板对象，也可以使用静态函数方式 完成模板相关功能调用
    * @constructor
@@ -169,9 +164,6 @@
   const Simplite = function (options) {
     mixin(getConfig(options), this);
   };
-
-  Simplite.escape = escape;
-
   /**
    * 为模板引擎注入过滤方法
    * @param {string} name 注入的方法名称
@@ -181,7 +173,6 @@
   Simplite.addFilter = (name, fun, simplite) => {
     (simplite || Simplite).filters[name] = fun;
   };
-
   /**
    * 获取名字为name的filter
    * @param {string} name 注入的方法名称
@@ -191,7 +182,6 @@
   Simplite.getFilter = (name, simplite) => {
     return (simplite || Simplite).filters[name];
   };
-
   /**
    * 为模板引擎注册模板
    * @param {string} name 注入的模板名称
@@ -201,7 +191,6 @@
   Simplite.addTemplate = (name, template, simplite) => {
     (simplite || Simplite).templates[name] = template;
   };
-
   /**
    * 添加处理过滤数据方法
    * @param {string} name 需要调用的方法名称
@@ -211,12 +200,11 @@
   Simplite.filter = function (name, ...data) {
     return this.filters[name].apply(this, data);
   };
-
   /**
    * 引入子模板
    * @param {string} name 子模板名称
    * @param {*?} extra 可以有多个数据源
-   * @return {string} 返回使用data数据填充好模板的html字符串
+   * @return {string} 返回使用data数据填充好html字符串
    */
   Simplite.include = function (name, ...extra) {
     const len = extra.length;
@@ -252,7 +240,6 @@
     }
     return Simplite.render(name, data, this);
   };
-
   Simplite.compile = (name, simplite) => {
     simplite = simplite || Simplite;
     try {
@@ -268,7 +255,6 @@
       throw e;
     }
   };
-
   /**
    * 向模板渲染成填充好数据的dom片段的字符串形式
    * @param {string} name 模板名称
@@ -278,7 +264,6 @@
   Simplite.render = (name, data, simplite) => {
     return (simplite || Simplite).compiles[name](data);
   };
-
   /**
    * 把字符串模板编译成代码语句字符串
    * @param {string} template 模板内容
@@ -315,7 +300,7 @@
         "g"
       );
     }
-    const codeBlock = template
+    let codeBlock = template
       .replace(htmlReg, (all) => {
         return htmlHandler(all, simplite.attrTagReg);
       })
@@ -326,9 +311,9 @@
       .replace(keywordReg, (all, pre, keyword, args) => {
         return keywordHandler(all, pre, keyword, args, simplite.dataKey);
       });
+    // 已完全移除autoSemicolon相关代码，不做任何分号处理
     return startBlock + codeBlock + endBlock;
   };
-
   /**
    * 输出的属性值的默认值
    * @param {string} val 原始的属性值
@@ -338,6 +323,7 @@
     return val == null ? "" : val;
   };
 
+  Simplite.escape = escape;
   /**
    * html模板编译
    * @param {string} name 模板名称
@@ -346,7 +332,6 @@
   Simplite.prototype.compile = function (name) {
     return Simplite.compile(name, this);
   };
-
   /**
    * 使用data的数据渲染指定name的模板
    * @param {string} name 模板名称
@@ -356,7 +341,6 @@
   Simplite.prototype.render = function (name, data) {
     return Simplite.render(name, data, this);
   };
-
   /**
    * 注入名字为name的filter
    * @param {string} name 注入的方法名称
@@ -365,7 +349,6 @@
   Simplite.prototype.addFilter = function (name, fun) {
     Simplite.addFilter(name, fun, this);
   };
-
   /**
    * 获取名字为name的filter
    * @param {string} name 注入的方法名称
@@ -374,7 +357,6 @@
   Simplite.prototype.getFilter = function (name) {
     return Simplite.getFilter(name, this);
   };
-
   /**
    * 注册模板，主要为name和html模板建立关联，方便后续获取
    * @param {string} name 模板的名称
@@ -383,16 +365,14 @@
   Simplite.prototype.addTemplate = function (name, template) {
     Simplite.addTemplate(name, template, this);
   };
-
   /**
    * 使用指定name的filter对传入的数据做处理
    * @param {string} name 注入的方法名称
    * @param {*} ... 传入方法的不定长参数
    */
   Simplite.prototype.filter = function (name, ...data) {
-    return Simplite.filter.apply(this, [name].concat(data));
+    return Simplite.filter.apply(this, [name, ...data]);
   };
-
   /**
    * 根据name导入模板
    * @param {string} name 注入的方法名称
@@ -401,7 +381,6 @@
   Simplite.prototype.include = function (name, ...data) {
     return Simplite.include.apply(this, [name].concat(data));
   };
-
   /**
    * 输出的属性值的默认值
    * @param {string} val 原始的属性值
@@ -410,6 +389,5 @@
   Simplite.prototype.defaultAttr = (val) => {
     return Simplite.defaultAttr(val);
   };
-
   return mixin(getConfig(), Simplite);
 });
